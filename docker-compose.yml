@@ -1,0 +1,64 @@
+version: '3.9'
+services:
+
+  psql:
+    ports:
+      - "5432:5432"
+    image: postgres:13
+    volumes:
+      - /data/djanghi/psql:/var/lib/postgresql
+      - ./entrypoints/init-database.sh:/docker-entrypoint-initdb.d/init-database.sh
+    environment:
+      - POSTGRES_USER=djanghi-user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_HOST=psql
+      - POSTGRES_DB=djanghi-db
+      - ALLOW_IP_RANGE=0.0.0.0/0
+
+  djanghi-server:
+    build:
+      context: .
+      target: local
+    image: djanghi
+    command: ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    networks:
+      default:
+        aliases:
+          - apps-project-runserver
+      djanghi-portal:
+        aliases:
+          - apps-project-runserver
+    depends_on:
+      - psql
+    environment:
+      - PYTHONDONTWRITEBYTECODE=1
+      - ENV
+      - SECRET_KEY
+      - SERVICE=runserver
+      - LOG_LEVEL
+      - FORCE_DEBUG
+
+  django-shell:
+    build:
+      context: .
+      target: local
+    image: djanghi
+    depends_on:
+      - psql
+    volumes:
+      - .:/app
+    networks:
+      default:
+        aliases:
+          - apps-project-shell
+      djanghi-portal:
+        aliases:
+          - apps-project-shell
+
+networks:
+  djanghi-portal:
+    external: true

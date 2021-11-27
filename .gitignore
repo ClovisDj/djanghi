@@ -1,0 +1,9 @@
+# created by virtualenv automatically
+
+.idea
+.virtualenv
+__pycache__/
+
+scratch.py
+
+pyvenv.cfg
