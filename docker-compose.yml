@@ -1,4 +1,16 @@
 version: '3.9'
+
+x-common-environment: &common-environ
+  PYTHONDONTWRITEBYTECODE: 1
+  ENV:
+  SECRET_KEY:
+  POSTGRES_USER:
+  POSTGRES_PASSWORD:
+  POSTGRES_HOST:
+  POSTGRES_DB:
+  DEBUG:
+  DB_PORT:
+
 services:
 
   psql:
@@ -35,12 +47,7 @@ services:
     depends_on:
       - psql
     environment:
-      - PYTHONDONTWRITEBYTECODE=1
-      - ENV
-      - SECRET_KEY
-      - SERVICE=runserver
-      - LOG_LEVEL
-      - FORCE_DEBUG
+      <<: *common-environ
 
   django-shell:
     build:
@@ -51,6 +58,8 @@ services:
       - psql
     volumes:
       - .:/app
+    environment:
+      <<: *common-environ
     networks:
       default:
         aliases:

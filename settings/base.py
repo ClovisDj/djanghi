@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
-
+import os
 from pathlib import Path
 
 import environ
@@ -29,12 +29,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-glu9z^w-#81d&^6=f34l7(jzch5$5y0_8&^6q53)w8xqpig7(0'
+SECRET_KEY = ENV('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = ENV('DEBUG')
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -83,7 +83,13 @@ WSGI_APPLICATION = 'apps.wsgi.application'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 DATABASES = {
-    'default': ENV.db(default='psql://djanghi-user:password@psql:5432/djanghi-db'),
+    'default': ENV.db(
+        default=f"{ENV('POSTGRES_HOST')}:"
+                f"//{ENV('POSTGRES_USER')}:"
+                f"{ENV('POSTGRES_PASSWORD')}@"
+                f"{ENV('POSTGRES_HOST')}:"
+                f"{ENV('DB_PORT')}/{ENV('POSTGRES_DB')}"
+    ),
 }
 
 

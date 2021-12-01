@@ -5,12 +5,10 @@ LABEL maintainer="Clovis Djiometsa <clovis@dnclovis.com>"
 ENV LANG C.UTF-8
 ENV PYTHONUNBUFFERED 1
 
-RUN apk add --no-cache bash wget libpq icu-libs && \
+RUN apk add --no-cache bash wget libpq icu-libs geos gdal&& \
     wget https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py && \
     python get-poetry.py --version 1.1.11 && \
     apk del wget
-
-RUN apk add --no-cache geos gdal
 
 # Install and configure virtualenv
 RUN pip install virtualenv==20.10.0
