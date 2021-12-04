@@ -8,7 +8,10 @@ build:
 poetry:
 	$(user-shell) sh -c "virtualenv .virtualenv && source .virtualenv/bin/activate && poetry $(O)"
 
-build-virtualenv:
+poetry-lock:
+		$(user-shell) sh -c "virtualenv .virtualenv && source .virtualenv/bin/activate && poetry lock"
+
+poetry-install:
 	$(user-shell) sh -c "virtualenv .virtualenv && source .virtualenv/bin/activate && poetry install"
 
 install-package:

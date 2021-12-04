@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
-import os
+
 from pathlib import Path
 
 import environ
@@ -17,9 +17,6 @@ import environ
 from glob import glob
 
 ENV = environ.Env()
-
-GDAL_LIBRARY_PATH = glob('/usr/lib/libgdal.so.*')[0]
-GEOS_LIBRARY_PATH = glob('/usr/lib/libgeos_c.so.*')[0]
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -32,21 +29,30 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = ENV('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = ENV('DEBUG')
+DEBUG = ENV.bool('DEBUG')
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ENV.list('ALLOWED_HOSTS')
 
 # Application definition
-
-INSTALLED_APPS = [
+BASE_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+]
+
+PACKAGE_APPS = [
+    'rest_framework',
+    'rest_framework_json_api',
+]
+
+DJANGHI_APPS = [
     'apps.profiles',
 ]
+
+INSTALLED_APPS = BASE_APPS + PACKAGE_APPS + DJANGHI_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -135,3 +141,7 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+GDAL_LIBRARY_PATH = glob('/usr/lib/libgdal.so.*')[0]
+GEOS_LIBRARY_PATH = glob('/usr/lib/libgeos_c.so.*')[0]

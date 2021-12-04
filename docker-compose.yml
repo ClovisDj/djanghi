@@ -10,6 +10,11 @@ x-common-environment: &common-environ
   POSTGRES_DB:
   DEBUG:
   DB_PORT:
+  ALLOWED_HOSTS:
+  ACCESS_TOKEN_LIFETIME:
+  REFRESH_TOKEN_LIFETIME:
+  JWT_SECRET_KEY:
+  AUTH_HEADER_TYPES:
 
 services:
 
