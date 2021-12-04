@@ -14,8 +14,11 @@ then
     su-exec $USER_ID:$GROUP_ID virtualenv $VIRTUAL_ENV
 fi
 
-echo " ... applying applicable migrations"
-python manage.py migrate
+if [[ "ENVIRONMENT" = "PROD" ]];
+then
+  echo " ... applying applicable migrations"
+  python manage.py migrate
+fi
 
 exec su-exec $USER_ID:$GROUP_ID "$@"
 
