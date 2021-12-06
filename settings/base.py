@@ -35,7 +35,6 @@ DEBUG = ENV.bool('DEBUG')
 
 ALLOWED_HOSTS = ENV.list('ALLOWED_HOSTS')
 
-# Application definition
 BASE_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -148,3 +147,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 GDAL_LIBRARY_PATH = glob('/usr/lib/libgdal.so.*')[0]
 GEOS_LIBRARY_PATH = glob('/usr/lib/libgeos_c.so.*')[0]
+
+DEFAULT_REGISTRATION_LINK_LIKE = 10     # 10 Days
+
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+AUTH_USER_MODEL = 'profiles.User'
+AUTHENTICATION_BACKENDS = ['apps.utils.DjanghiCustomBackend']
+

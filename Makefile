@@ -28,5 +28,8 @@ runserver:
 bash:
 	$(user-shell) bash
 
+migrations:
+	$(user-shell) sh -c "./manage.py makemigrations"
+
 migrate:
 	$(user-shell) sh -c "./manage.py migrate"
