@@ -47,12 +47,17 @@ class User(AbstractUser):
         related_name="user_pool"
     )
 
-    association = models.ForeignKey('associations.Association', on_delete=models.CASCADE, related_name='users')
+    association = models.ForeignKey('associations.Association', on_delete=models.CASCADE, related_name='users', null=True, blank=True)
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = []
+    REQUIRED_FIELDS = ['username']
 
     class Meta:
         constraints = [
             models.UniqueConstraint(fields=['email', 'association'], name='unique_username_by_association')
         ]
+
+    def save(self, *args, **kwargs):
+        self.username = self.email
+
+        return super().save(*args, **kwargs)

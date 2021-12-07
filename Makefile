@@ -33,3 +33,6 @@ migrations:
 
 migrate:
 	$(user-shell) sh -c "./manage.py migrate"
+
+down:
+	docker-compose down

@@ -27,9 +27,16 @@ class DjanghiCustomBackend(ModelBackend):
             username = kwargs.get(User.USERNAME_FIELD)
         if username is None or password is None:
             return
+
+        user_kwargs = {
+            'email': username
+        }
+        association_label = kwargs.get('association')
+        if association_label:
+            user_kwargs['association__label__iexact'] = association_label
+
         try:
-            # In our system username === email
-            user = User.objects.get(email=username)
+            user = User.objects.get(**user_kwargs)
         except User.DoesNotExist:
             # Run the default password hasher once to reduce the timing
             # difference between an existing and a nonexistent user (#20760).
