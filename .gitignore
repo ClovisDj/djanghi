@@ -8,3 +8,4 @@ scratch.py
 
 pyvenv.cfg
 .env
+.coverage

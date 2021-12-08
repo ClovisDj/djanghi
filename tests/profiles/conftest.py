@@ -1,0 +1,24 @@
+import pytest
+
+from apps.profiles.models import User
+
+
+@pytest.fixture
+def user_create_data():
+    return {
+        'email': '',
+        'password': 'Password123',
+        'first_name': 'Paul',
+        'last_name': 'Jean',
+    }
+
+
+@pytest.fixture
+def user_alice(user_create_data):
+    user_create_data['email'] = 'alice@abc.com'
+    user_create_data['first_name'] = 'alice'
+    user_create_data['last_name'] = 'Johnson'
+    return User.objects.create_user(
+        'alice@abc.com',
+        **user_create_data
+    )

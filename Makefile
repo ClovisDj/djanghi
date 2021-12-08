@@ -36,3 +36,6 @@ migrate:
 
 down:
 	docker-compose down
+
+pytest:
+	$(user-shell) bash -c "pytest --cov=apps  --cov-report=term --capture=no"
