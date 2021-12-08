@@ -153,5 +153,4 @@ DEFAULT_REGISTRATION_LINK_LIKE = 10     # 10 Days
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 AUTH_USER_MODEL = 'profiles.User'
-AUTHENTICATION_BACKENDS = ['apps.utils.DjanghiCustomBackend']
-
+AUTHENTICATION_BACKENDS = ['apps.extensions.backend.DjanghiModelBackend']
