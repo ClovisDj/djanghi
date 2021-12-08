@@ -47,7 +47,7 @@ pyexcel = "~0.5"
 pyexcel-xls = "~0.5"
 pyexcel-xlsx = "~0.5"
 pyrasite = {git = "git://github.com/diamond-lizard/pyrasite.git", rev = "d1e2301fe60ab03e99a51ca1b105f7c3368b1a33"}
-pytest-cov = "~3.0"
+pytest-cov = "~2.6"
 pytest-django = "~3.5"
 pytest-mock = "^1.10"
 responses = "~0.12"
