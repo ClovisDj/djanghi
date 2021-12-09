@@ -16,11 +16,13 @@ import environ
 
 from glob import glob
 
-ENV = environ.Env()
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Read environment variables from correct location
+environ.Env.read_env(env_file=f'{BASE_DIR}/.env')
+
+ENV = environ.Env()
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
@@ -34,6 +36,10 @@ SECRET_KEY = ENV('SECRET_KEY')
 DEBUG = ENV.bool('DEBUG')
 
 ALLOWED_HOSTS = ENV.list('ALLOWED_HOSTS')
+
+# Environment specific hosts
+API_HOST = ENV.str('API_HOST')
+FRONT_END_HOST = ENV('FRONT_END_HOST')
 
 BASE_APPS = [
     'django.contrib.admin',

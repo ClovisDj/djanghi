@@ -36,6 +36,17 @@ def association_abc(association_create_data):
     return Association.objects.create(**association_create_data)
 
 
+@pytest.fixture
+def association_xyz(association_create_data):
+    association_create_data['name'] = 'Association - xyz'
+    association_create_data['label'] = 'XYZ'
+    association_create_data['email_from'] = 'noreply@xyz.com'
+    return Association.objects.create(**association_create_data)
+
+
 @pytest.fixture(autouse=True)
 def enable_db_access_for_all_tests(db):
+    """
+    Special fixture to enable db access to all tests
+    """
     pass

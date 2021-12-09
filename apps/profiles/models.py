@@ -18,7 +18,11 @@ class CustomPermission(Permission):
     # Had to paste these here due to circular import
     updated_at = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    association = models.ForeignKey('associations.Association', on_delete=models.CASCADE, related_name='permissions')
+    association = models.ForeignKey(
+        'associations.Association',
+        on_delete=models.CASCADE,
+        related_name='permissions'
+    )
 
 
 class User(AbstractUser):
@@ -47,7 +51,13 @@ class User(AbstractUser):
         related_name="user_pool"
     )
 
-    association = models.ForeignKey('associations.Association', on_delete=models.CASCADE, related_name='users', null=True, blank=True)
+    association = models.ForeignKey(
+        'associations.Association',
+        on_delete=models.CASCADE,
+        related_name='users',
+        null=True,
+        blank=True
+    )
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
