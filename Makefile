@@ -20,7 +20,7 @@ install-package:
 	$(user-shell) sh -c "poetry $(O) $(P)"
 
 shell:
-	$(user-shell) sh -c "./manage.py shell"
+	$(user-shell) sh -c "./manage.py shell_plus"
 
 runserver:
 	docker-compose up --force-recreate psql djanghi-server
