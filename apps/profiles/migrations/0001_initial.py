@@ -18,6 +18,20 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
+            name='UserRole',
+            fields=[
+                ('id', models.UUIDField(db_index=True, default=uuid.uuid4, editable=False, primary_key=True,
+                                        serialize=False)),
+                ('updated_at', models.DateTimeField(auto_now=True)),
+                ('created_at', models.DateTimeField(auto_now_add=True)),
+                ('value', models.CharField(max_length=2, unique=True)),
+                ('description', models.CharField(max_length=200)),
+            ],
+            options={
+                'abstract': False,
+            },
+        ),
+        migrations.CreateModel(
             name='CustomPermission',
             fields=[
                 ('permission_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='auth.permission')),
@@ -57,9 +71,13 @@ class Migration(migrations.Migration):
                 ('updated_at', models.DateTimeField(auto_now=True)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('username', models.CharField(max_length=255)),
+                ('city_of_birth', models.CharField(blank=True, max_length=100, null=True)),
+                ('country_of_birth', models.CharField(blank=True, max_length=100, null=True)),
+                ('date_of_birth', models.DateField(blank=True, null=True)),
+                ('roles', models.ManyToManyField(blank=True, null=True, to='profiles.UserRole')),
                 ('email', models.EmailField(db_index=True, max_length=254)),
                 ('date_joined', models.DateTimeField(default=django.utils.timezone.now, verbose_name='date joined')),
-                ('association', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='users', to='associations.association')),
+                ('association', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='users', to='associations.association')),
                 ('groups', models.ManyToManyField(blank=True, help_text='The groups this user belongs to. A user will get all permissions granted to each of their groups.', related_name='user_pool', to='profiles.CustomGroup')),
                 ('user_permissions', models.ManyToManyField(blank=True, help_text='Specific permissions for this user.', related_name='user_pool', to='profiles.CustomPermission')),
             ],

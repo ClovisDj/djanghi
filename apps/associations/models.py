@@ -27,9 +27,38 @@ class Association(CreateUpdateDateMixin, UUIDModelMixin, models.Model):
 class MemberContributionField(CreateUpdateDateMixin, UUIDModelMixin, models.Model):
     name = models.CharField(max_length=30, null=False)
     is_required = models.BooleanField(default=True)
-    association = models.ForeignKey(Association, on_delete=models.CASCADE, related_name='member_contribution_fields')
+    association = models.ForeignKey(
+        Association,
+        on_delete=models.CASCADE,
+        related_name='member_contribution_fields'
+    )
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=['name', 'association'], name='unique_contribution_name_by_association')
+            models.UniqueConstraint(
+                fields=['name', 'association'],
+                name='unique_contribution_name_by_association'
+            )
         ]
+
+
+class UserRegistrationLink(CreateUpdateDateMixin, UUIDModelMixin, models.Model):
+    user = models.ForeignKey(
+        'profiles.User',
+        on_delete=models.CASCADE,
+        related_name='registration_links'
+    )
+    # Even though user has an association attached to, we still it here for backend filter
+    association = models.ForeignKey(
+        Association,
+        on_delete=models.CASCADE,
+        related_name='registration_links'
+    )
+    expiration_date = models.DateTimeField(null=False, blank=False)
+    send_time = models.DateTimeField(null=True, blank=True)
+    link = models.URLField(null=False, blank=False)
+
+    def save(self, *args, **kwargs):
+        self.link = f'{settings.API_HOST}/{str(self.association_id)}/{str(self.user_id)}/{str(self.id)}'
+
+        return super().save(*args, **kwargs)
