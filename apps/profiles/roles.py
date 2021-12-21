@@ -1,16 +1,17 @@
 
-REGULAR_USER = 'A'
-ADMIN_SITE_ACCESS = 'B'
-MANAGE_PAYMENTS = 'C'
-MANAGE_USER_COSTS = 'D'
-MANAGE_COTISATION = 'E'
+ADMIN_SITE_ACCESS = 'A'
+MANAGE_PAYMENTS = 'B'
+MANAGE_USER_COSTS = 'C'
+MANAGE_COTISATION = 'D'
 
+FULL_ADMIN_DEFINITION = (
+    ADMIN_SITE_ACCESS,
+    MANAGE_PAYMENTS,
+    MANAGE_USER_COSTS,
+    MANAGE_COTISATION
+)
 
 ROLE_DEFINITIONS = (
-    dict(
-        value=REGULAR_USER,
-        description='Regular Association User without any admin role',
-    ),
     dict(
         value=ADMIN_SITE_ACCESS,
         description='Basic Admin role with read only access to his/her association admin pages',

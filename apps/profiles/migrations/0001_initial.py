@@ -2,7 +2,7 @@
 
 import django.contrib.auth.models
 from django.db import migrations, models
-import django.db.models.deletion
+import apps.profiles.models
 import django.utils.timezone
 import uuid
 
@@ -81,8 +81,11 @@ class Migration(migrations.Migration):
                 ('groups', models.ManyToManyField(blank=True, help_text='The groups this user belongs to. A user will get all permissions granted to each of their groups.', related_name='user_pool', to='profiles.CustomGroup')),
                 ('user_permissions', models.ManyToManyField(blank=True, help_text='Specific permissions for this user.', related_name='user_pool', to='profiles.CustomPermission')),
             ],
+        ),
+        migrations.AlterModelManagers(
+            name='user',
             managers=[
-                ('objects', django.contrib.auth.models.UserManager()),
+                ('objects', apps.profiles.models.CustomUserManager()),
             ],
         ),
         migrations.AddConstraint(
