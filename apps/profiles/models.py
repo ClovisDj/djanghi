@@ -50,7 +50,7 @@ class CustomPermission(Permission):
 
 class CustomUserManager(UserManager):
     def get_actives(self):
-        return self.filter(is_active=True, association_id__isnull=True)
+        return self.filter(is_active=True, association_id__isnull=False)
 
     def for_association(self, association):
         return self.filter(association=association)
@@ -140,7 +140,8 @@ class User(AbstractUser):
 
     def add_roles(self, *role):
         roles = self.get_roles(*role)
-        self.roles.add(*roles)
+        if roles:
+            self.roles.add(*roles)
 
     def user_roles_set_by(self, field_name):
         return set(self.roles.all().values_list(field_name, flat=True))
@@ -154,6 +155,15 @@ class User(AbstractUser):
         if diff_roles_set:
             self.roles.clear()
             self.roles.add(*diff_roles_set)
+
+    def has_roles(self, *roles):
+        roles_obj = self.get_roles(*roles)
+        if not roles_obj:
+            return False
+
+        roles_set_by_value = {role.value for role in roles_obj}
+        user_roles_set = self.user_roles_set_by('value')
+        return bool(user_roles_set.intersection(roles_set_by_value))
 
     @property
     def is_full_admin(self):

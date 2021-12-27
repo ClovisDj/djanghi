@@ -41,7 +41,7 @@ class TestUserLoginView:
         })
         response_data = response.json()
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
-        assert response_data['detail'] == 'No active account found with the given credentials'
+        assert response_data['errors'][0]['detail'] == 'No active account found with the given credentials'
 
     def test_obtain_token(self, base_client, user_alice, association_abc):
         response = base_client.post(self.login_url, {
@@ -49,7 +49,7 @@ class TestUserLoginView:
             'password': 'Password123',
             'association': association_abc.label.upper()
         })
-        response_data = response.json()
+        response_data = response.json()['data']
         assert response.status_code == status.HTTP_200_OK
         assert response_data['association'] == str(association_abc.id)
         assert 'access' in response_data

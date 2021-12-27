@@ -1,1 +1,3 @@
 pyvenv.cfg
+
+tests/profiles/log_file.log

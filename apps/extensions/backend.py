@@ -1,4 +1,9 @@
 from django.contrib.auth.backends import ModelBackend
+from django.contrib.auth.middleware import AuthenticationMiddleware
+from django.contrib.auth.models import AnonymousUser
+from rest_framework.filters import BaseFilterBackend
+
+from apps.utils import extract_user_from_request_token
 
 
 class DjanghiModelBackend(ModelBackend):
@@ -36,3 +41,22 @@ class DjanghiModelBackend(ModelBackend):
         except User.DoesNotExist:
             return None
         return user if self.user_can_authenticate(user) else None
+
+
+class CustomAuthenticationMiddleware(AuthenticationMiddleware):
+
+    def process_request(self, request):
+        super().process_request(request)
+
+        if isinstance(request.user, AnonymousUser):
+            user_from_token = extract_user_from_request_token(request)
+            if user_from_token:
+                request.user = user_from_token
+
+
+class AssociationFilterBackend(BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        if request.user and queryset.exists() and hasattr(queryset[0], 'association'):
+            return queryset.filter(association_id=request.user.association_id)
+
+        return queryset

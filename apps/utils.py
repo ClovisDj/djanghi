@@ -1,6 +1,7 @@
 import uuid
 
 from django.db import models
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 
 class UUIDModelMixin(models.Model):
@@ -24,3 +25,11 @@ def is_valid_uuid(uuid_str, version=4):
     except ValueError:
         return False
     return str(uuid_obj) == uuid_str
+
+
+def extract_user_from_request_token(request):
+    is_authenticated = JWTAuthentication().authenticate(request)
+    if is_authenticated:
+        return is_authenticated[0]
+
+    return None

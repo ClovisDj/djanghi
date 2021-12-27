@@ -38,4 +38,4 @@ down:
 	docker-compose down
 
 pytest:
-	$(user-shell) bash -c "pytest --cov=apps --no-migrations --cov-report=term --capture=no"
+	$(user-shell) bash -c "pytest --cov=apps --no-migrations --cov-report=term"

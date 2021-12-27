@@ -21,5 +21,5 @@ router = routers.SimpleRouter()
 
 urlpatterns = [
     path('staff/', admin.site.urls),
-    path('api/', include('apps.profiles.urls', namespace='profiles_urls')),
+    path('', include('apps.profiles.urls', namespace='profiles_urls')),
 ]

@@ -51,6 +51,7 @@ BASE_APPS = [
 ]
 
 PACKAGE_APPS = [
+    'django_filters',
     'rest_framework',
     'rest_framework_json_api',
     'django_extensions',
@@ -71,6 +72,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'apps.extensions.backend.CustomAuthenticationMiddleware',
 ]
 
 ROOT_URLCONF = 'apps.urls'

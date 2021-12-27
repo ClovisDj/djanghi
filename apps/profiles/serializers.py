@@ -1,9 +1,12 @@
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import update_last_login
-from rest_framework import serializers, exceptions
+from rest_framework_json_api import serializers
+from rest_framework import exceptions
 from rest_framework_simplejwt.serializers import TokenObtainSerializer
 from rest_framework_simplejwt.settings import api_settings
 from rest_framework_simplejwt.tokens import RefreshToken
+
+from .models import User
 
 
 class LoginSerializer(TokenObtainSerializer):
@@ -51,3 +54,22 @@ class LoginSerializer(TokenObtainSerializer):
             update_last_login(None, self.user)
 
         return data
+
+
+class UserModelSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        read_only_fields = (
+            'created_at',
+            'updated_at',
+            'date_joined',
+        )
+        exclude = (
+            'password',
+            'groups',
+            'user_permissions',
+            'is_superuser',
+            'is_staff',
+            'last_login',
+        )
