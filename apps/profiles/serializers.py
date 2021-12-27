@@ -64,6 +64,8 @@ class UserModelSerializer(serializers.ModelSerializer):
             'created_at',
             'updated_at',
             'date_joined',
+            'last_login',
+            'is_registered',
         )
         exclude = (
             'password',
@@ -71,5 +73,4 @@ class UserModelSerializer(serializers.ModelSerializer):
             'user_permissions',
             'is_superuser',
             'is_staff',
-            'last_login',
         )

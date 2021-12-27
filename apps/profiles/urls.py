@@ -10,8 +10,8 @@ router = routers.SimpleRouter()
 router.register(r'users', UserModelViewSet, basename='users')
 
 urlpatterns = [
-    path('obtain_token/', ApiLoginView.as_view(), name='login_view'),
-    path('refresh_token/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('obtain_token', ApiLoginView.as_view(), name='login_view'),
+    path('refresh_token', TokenRefreshView.as_view(), name='token_refresh'),
 ]
 
 urlpatterns += router.urls

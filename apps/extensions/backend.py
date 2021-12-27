@@ -1,7 +1,11 @@
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.middleware import AuthenticationMiddleware
 from django.contrib.auth.models import AnonymousUser
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.filters import BaseFilterBackend
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework_simplejwt.exceptions import TokenError
+from rest_framework_simplejwt.settings import api_settings
 
 from apps.utils import extract_user_from_request_token
 
@@ -16,7 +20,7 @@ class DjanghiModelBackend(ModelBackend):
             return
 
         user_kwargs = {
-            'email': username
+            'email': username.lower()
         }
         association_label = kwargs.get('association')
         if association_label:
@@ -56,7 +60,24 @@ class CustomAuthenticationMiddleware(AuthenticationMiddleware):
 
 class AssociationFilterBackend(BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
+        # At this point of the process any requester should be authenticated
+        # and the user object properly attached to the request
         if request.user and queryset.exists() and hasattr(queryset[0], 'association'):
             return queryset.filter(association_id=request.user.association_id)
 
         return queryset
+
+
+class CustomJWTAuthentication(JWTAuthentication):
+
+    def get_validated_token(self, raw_token):
+        """
+        Override this method so that we do not return 500 to the client instead we return 403
+        """
+        for AuthToken in api_settings.AUTH_TOKEN_CLASSES:
+            try:
+                return AuthToken(raw_token)
+            except TokenError:
+                pass
+
+        raise PermissionDenied()

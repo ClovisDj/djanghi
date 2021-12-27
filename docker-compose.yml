@@ -23,7 +23,7 @@ services:
       - "5432:5432"
     image: postgres:13
     volumes:
-      - /data/djanghi/psql:/var/lib/postgresql/data
+      - data-psql:/var/lib/postgresql/data
       - ./entrypoints/init-database.sh:/docker-entrypoint-initdb.d/init-database.sh
     environment:
       - POSTGRES_USER=djanghi-user
@@ -72,6 +72,10 @@ services:
       djanghi-portal:
         aliases:
           - apps-project-shell
+
+volumes:
+  data-psql:
+    driver: local
 
 networks:
   djanghi-portal:

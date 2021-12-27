@@ -70,6 +70,7 @@ class User(AbstractUser):
     username = models.CharField(max_length=255)
     email = models.EmailField(db_index=True)
     date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
+    is_registered = models.BooleanField(default=False)
 
     # User meta data
     date_of_birth = models.DateField(null=True, blank=True)
@@ -100,7 +101,7 @@ class User(AbstractUser):
         null=True,
         blank=True
     )
-    roles = models.ManyToManyField(UserRole, null=True, blank=True)
+    roles = models.ManyToManyField(UserRole)
 
     objects = CustomUserManager()
 
@@ -108,6 +109,7 @@ class User(AbstractUser):
     REQUIRED_FIELDS = ['username']
 
     class Meta:
+        ordering = ['date_joined']
         constraints = [
             models.UniqueConstraint(fields=['email', 'association'], name='unique_username_by_association')
         ]
@@ -128,7 +130,7 @@ class User(AbstractUser):
             is_uuid_str = isinstance(role, str) and is_valid_uuid(role)
             is_role_value = isinstance(role, str) and len(role) < 2
             if is_uuid_str or is_role_value:
-                query_kwarg = dict(id=role) if is_uuid_str else dict(value=role)
+                query_kwarg = dict(id=role) if is_uuid_str else dict(value=role.upper())
                 try:
                     role_obj = UserRole.objects.get_actives().get(**query_kwarg)
                 except UserRole.DoesNotExist:
@@ -163,7 +165,7 @@ class User(AbstractUser):
 
         roles_set_by_value = {role.value for role in roles_obj}
         user_roles_set = self.user_roles_set_by('value')
-        return bool(user_roles_set.intersection(roles_set_by_value))
+        return bool(roles_set_by_value.issubset(user_roles_set))
 
     @property
     def is_full_admin(self):

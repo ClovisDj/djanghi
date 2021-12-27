@@ -38,4 +38,14 @@ down:
 	docker-compose down
 
 pytest:
-	$(user-shell) bash -c "pytest --cov=apps --no-migrations --cov-report=term"
+	$(user-shell) bash -c "pytest --cov=apps --cov-report=term"
+
+# Use caution with the below command since it will wipe out your local postgres db
+clear-psql:
+	$(MAKE) down
+	docker volume rm djanghi_data-psql
+
+# Use this command to pre-populate the db
+load-data:
+	$(MAKE) migrate
+	$(user-shell) sh -c "./manage.py loaddata init_data.json --exclude profiles.UserRole"

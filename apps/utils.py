@@ -1,7 +1,7 @@
 import uuid
 
 from django.db import models
-from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.exceptions import PermissionDenied
 
 
 class UUIDModelMixin(models.Model):
@@ -28,7 +28,13 @@ def is_valid_uuid(uuid_str, version=4):
 
 
 def extract_user_from_request_token(request):
-    is_authenticated = JWTAuthentication().authenticate(request)
+    from apps.extensions.backend import CustomJWTAuthentication
+
+    try:
+        is_authenticated = CustomJWTAuthentication().authenticate(request)
+    except PermissionDenied:
+        return None
+
     if is_authenticated:
         return is_authenticated[0]
 

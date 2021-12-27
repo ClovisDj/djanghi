@@ -93,6 +93,11 @@ TEMPLATES = [
     },
 ]
 
+FIXTURE_DIRS = [
+    f'{BASE_DIR}/tests/fixtures',
+]
+
+
 WSGI_APPLICATION = 'apps.wsgi.application'
 
 
@@ -108,10 +113,6 @@ DATABASES = {
                 f"{ENV('DB_PORT')}/{ENV('POSTGRES_DB')}"
     ),
 }
-
-
-# Password validation
-# https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
