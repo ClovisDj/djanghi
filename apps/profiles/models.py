@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import AbstractUser, Group, Permission, UserManager
 from django.db import models
 
-from apps.profiles.roles import FULL_ADMIN_DEFINITION
+from apps.profiles.roles import FULL_ADMIN, PAYMENT_MANAGER, COST_MANAGER, COTISATION_MANAGER
 from apps.utils import CreateUpdateDateMixin, UUIDModelMixin, is_valid_uuid
 
 
@@ -57,9 +57,6 @@ class CustomUserManager(UserManager):
 
     def admins(self):
         return self.annotate(num_roles=Count('roles')).filter(num_roles__gt=0)
-
-    def full_admins(self):
-        return self.admins().filter(num_roles=len(FULL_ADMIN_DEFINITION))
 
 
 class User(AbstractUser):
@@ -169,8 +166,20 @@ class User(AbstractUser):
 
     @property
     def is_full_admin(self):
-        return self.user_roles_set_by('value') == set(FULL_ADMIN_DEFINITION)
+        return self.has_roles(FULL_ADMIN)
+
+    @property
+    def is_payment_manager(self):
+        return self.has_roles(PAYMENT_MANAGER)
+
+    @property
+    def is_cost_manager(self):
+        return self.has_roles(COST_MANAGER)
+
+    @property
+    def is_cotisation_manager(self):
+        return self.has_roles(COTISATION_MANAGER)
 
     @property
     def is_admin(self):
-        return bool(self.user_roles_set_by('id'))
+        return self.roles.exists()

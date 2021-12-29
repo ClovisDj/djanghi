@@ -1,4 +1,4 @@
-from .base import ENVIRONMENT, DEBUG
+from .base import ENVIRONMENT, DEBUG, ENV
 
 
 DEFAULT_RENDERER_CLASSES = (
@@ -6,9 +6,9 @@ DEFAULT_RENDERER_CLASSES = (
 )
 
 REST_FRAMEWORK = {
-    'PAGE_SIZE': 10,
+    'PAGE_SIZE': ENV.int('PAGE_SIZE'),
     'EXCEPTION_HANDLER': 'rest_framework_json_api.exceptions.exception_handler',
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework_json_api.pagination.JsonApiPageNumberPagination',
+    'DEFAULT_PAGINATION_CLASS': 'apps.extensions.backend.CustomJsonApiPageNumberPagination',
     'DEFAULT_PARSER_CLASSES': (
         'rest_framework_json_api.parsers.JSONParser',
         'rest_framework.parsers.JSONParser',
@@ -16,7 +16,6 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_RENDERER_CLASSES': DEFAULT_RENDERER_CLASSES,
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        # 'rest_framework_simplejwt.authentication.JWTAuthentication',
         'apps.extensions.backend.CustomJWTAuthentication',
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication',
@@ -30,11 +29,10 @@ REST_FRAMEWORK = {
         'rest_framework_json_api.renderers.JSONRenderer',
     ),
     'DEFAULT_FILTER_BACKENDS': (
-        'rest_framework_json_api.filters.QueryParameterValidationFilter',
+        'apps.extensions.backend.AssociationFilterBackend',
         'rest_framework_json_api.filters.OrderingFilter',
         'rest_framework_json_api.django_filters.DjangoFilterBackend',
         'rest_framework.filters.SearchFilter',
-        'apps.extensions.backend.AssociationFilterBackend',
     ),
     'SEARCH_PARAM': 'filter[search]',
 

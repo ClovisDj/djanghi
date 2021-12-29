@@ -5,7 +5,7 @@ from rest_framework_simplejwt.views import TokenRefreshView
 from apps.profiles.views import ApiLoginView, UserModelViewSet
 
 app_name = 'profiles'
-router = routers.SimpleRouter()
+router = routers.SimpleRouter(trailing_slash=False)
 
 router.register(r'users', UserModelViewSet, basename='users')
 

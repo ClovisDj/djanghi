@@ -529,40 +529,40 @@
   },
   {
     "model": "profiles.userrole",
-    "pk": "a59844fb-b917-4d12-a96c-ec6bfd093276",
+    "pk": "077aa5ac-86ce-41cc-86fa-8fa6f2944672",
     "fields": {
-      "updated_at": "2021-12-27T16:26:36.761Z",
-      "created_at": "2021-12-27T16:26:36.761Z",
+      "updated_at": "2021-12-29T16:54:58.964Z",
+      "created_at": "2021-12-29T16:54:58.964Z",
+      "value": "A",
+      "description": "Admin with full access"
+    }
+  },
+  {
+    "model": "profiles.userrole",
+    "pk": "2180a738-9bff-4e5f-b6c3-9c083e8a2821",
+    "fields": {
+      "updated_at": "2021-12-29T16:54:58.968Z",
+      "created_at": "2021-12-29T16:54:58.968Z",
       "value": "B",
       "description": "Admin role with ability to enter and/or modify members payments"
     }
   },
   {
     "model": "profiles.userrole",
-    "pk": "bbd002ad-4ef5-4da4-833a-e0d6837229b7",
+    "pk": "9aad649c-7bf0-42b4-b9c7-57e663aa0829",
     "fields": {
-      "updated_at": "2021-12-27T16:26:36.766Z",
-      "created_at": "2021-12-27T16:26:36.766Z",
+      "updated_at": "2021-12-29T16:54:58.972Z",
+      "created_at": "2021-12-29T16:54:58.972Z",
       "value": "D",
       "description": "Admin role with ability to manage a `cotisation` round"
     }
   },
   {
     "model": "profiles.userrole",
-    "pk": "c1704d75-092f-4cbe-aacb-0a6f35071eaf",
+    "pk": "d28b983f-bee9-4048-af6a-1053fe2ca799",
     "fields": {
-      "updated_at": "2021-12-27T16:26:36.758Z",
-      "created_at": "2021-12-27T16:26:36.758Z",
-      "value": "A",
-      "description": "Basic Admin role with read only access to his/her association admin pages"
-    }
-  },
-  {
-    "model": "profiles.userrole",
-    "pk": "c8597137-8ddd-4f7f-84ed-ff9598b44888",
-    "fields": {
-      "updated_at": "2021-12-27T16:26:36.764Z",
-      "created_at": "2021-12-27T16:26:36.764Z",
+      "updated_at": "2021-12-29T16:54:58.970Z",
+      "created_at": "2021-12-29T16:54:58.970Z",
       "value": "C",
       "description": "Admin role with ability to subtract members costs"
     }
@@ -572,7 +572,7 @@
     "pk": "da3cfe5a-661e-49b9-8739-6026b96c4fe4",
     "fields": {
       "password": "pbkdf2_sha256$260000$nz7p3SVzKqD1PzI8yEdSgq$bHoWhPCOpdwNA6jSUPH/2O4AOm6vae/cR4Ua1WqVRcg=",
-      "last_login": "2021-12-27T16:44:48.056Z",
+      "last_login": "2021-12-29T17:01:45.874Z",
       "is_superuser": true,
       "first_name": "",
       "last_name": "",
@@ -590,7 +590,9 @@
       "association": "3c70c8be-a01f-40b2-bfca-3e748349fd8e",
       "groups": [],
       "user_permissions": [],
-      "roles": []
+      "roles": [
+        "077aa5ac-86ce-41cc-86fa-8fa6f2944672"
+      ]
     }
   },
   {

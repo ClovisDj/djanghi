@@ -3,6 +3,7 @@ from django.contrib.auth.middleware import AuthenticationMiddleware
 from django.contrib.auth.models import AnonymousUser
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.filters import BaseFilterBackend
+from rest_framework_json_api.pagination import JsonApiPageNumberPagination
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.settings import api_settings
@@ -81,3 +82,9 @@ class CustomJWTAuthentication(JWTAuthentication):
                 pass
 
         raise PermissionDenied()
+
+
+class CustomJsonApiPageNumberPagination(JsonApiPageNumberPagination):
+    page_query_param = 'page'
+    page_size_query_param = 'page_size'
+    max_page_size = 1000

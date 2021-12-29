@@ -4,6 +4,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from apps.associations.models import Association
 from apps.profiles.models import User
+from apps.profiles.roles import FULL_ADMIN
 
 
 @pytest.fixture(scope='session')
@@ -56,6 +57,7 @@ def user_create_data():
         'first_name': 'Paul',
         'last_name': 'Jean',
         'is_active': True,
+        'is_registered': True,
     }
 
 
@@ -65,6 +67,18 @@ def abc_user(user_create_data, association_abc):
     user_create_data['association_id'] = association_abc.id
     return User.objects.create_user(
         'abc.user.1@abc.com',
+        **user_create_data
+    )
+
+
+@pytest.fixture
+def user_alice(user_create_data, association_abc):
+    user_create_data['email'] = 'alice@abc.com'
+    user_create_data['first_name'] = 'alice'
+    user_create_data['last_name'] = 'Johnson'
+    user_create_data['association_id'] = association_abc.id
+    return User.objects.create_user(
+        'alice@abc.com',
         **user_create_data
     )
 
@@ -95,4 +109,17 @@ def authenticated_abc_user_client(base_client, abc_user):
     abc_user_token = RefreshToken.for_user(abc_user).access_token
     base_client.credentials(HTTP_AUTHORIZATION=f'JWT {abc_user_token}')
     return base_client
+
+
+@pytest.fixture
+def authenticated_alice_user_client(base_client, user_alice):
+    user_alice_token = RefreshToken.for_user(user_alice).access_token
+    base_client.credentials(HTTP_AUTHORIZATION=f'JWT {user_alice_token}')
+    return base_client
+
+
+@pytest.fixture
+def alice_full_admin(user_alice):
+    user_alice.add_roles(*[FULL_ADMIN])
+    return user_alice
 
