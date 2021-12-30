@@ -40,25 +40,3 @@ class MemberContributionField(CreateUpdateDateMixin, UUIDModelMixin, models.Mode
                 name='unique_contribution_name_by_association'
             )
         ]
-
-
-class UserRegistrationLink(CreateUpdateDateMixin, UUIDModelMixin, models.Model):
-    user = models.ForeignKey(
-        'profiles.User',
-        on_delete=models.CASCADE,
-        related_name='registration_links'
-    )
-    # Even though user has an association attached to, we still it here for backend filter
-    association = models.ForeignKey(
-        Association,
-        on_delete=models.CASCADE,
-        related_name='registration_links'
-    )
-    expiration_date = models.DateTimeField(null=False, blank=False)
-    send_time = models.DateTimeField(null=True, blank=True)
-    link = models.URLField(null=False, blank=False)
-
-    def save(self, *args, **kwargs):
-        self.link = f'{settings.API_HOST}/{str(self.association_id)}/{str(self.user_id)}/{str(self.id)}'
-
-        return super().save(*args, **kwargs)

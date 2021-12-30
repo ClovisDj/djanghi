@@ -14,3 +14,8 @@ class IsUserOrFullAdmin(BasePermission):
             return True
 
         return False
+
+
+class IsAdmin(BasePermission):
+    def has_permission(self, request, view):
+        return request.user.is_admin

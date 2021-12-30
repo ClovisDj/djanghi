@@ -5,7 +5,7 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework.filters import BaseFilterBackend
 from rest_framework_json_api.pagination import JsonApiPageNumberPagination
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from rest_framework_simplejwt.exceptions import TokenError
+from rest_framework_simplejwt.exceptions import TokenError, AuthenticationFailed
 from rest_framework_simplejwt.settings import api_settings
 
 from apps.utils import extract_user_from_request_token
@@ -63,13 +63,20 @@ class AssociationFilterBackend(BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
         # At this point of the process any requester should be authenticated
         # and the user object properly attached to the request
-        if request.user and queryset.exists() and hasattr(queryset[0], 'association'):
+        if request.user and queryset.exists() and hasattr(queryset.first(), 'association'):
             return queryset.filter(association_id=request.user.association_id)
 
         return queryset
 
 
 class CustomJWTAuthentication(JWTAuthentication):
+
+    def authenticate(self, request):
+        try:
+            auth = super().authenticate(request)
+        except AuthenticationFailed:
+            return None
+        return auth
 
     def get_validated_token(self, raw_token):
         """

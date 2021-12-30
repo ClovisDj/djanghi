@@ -1,5 +1,6 @@
 import uuid
 
+from django.conf import settings
 from django.db.models import Count
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -106,7 +107,7 @@ class User(AbstractUser):
     REQUIRED_FIELDS = ['username']
 
     class Meta:
-        ordering = ['date_joined']
+        ordering = ['-date_joined']
         constraints = [
             models.UniqueConstraint(fields=['email', 'association'], name='unique_username_by_association')
         ]
@@ -183,3 +184,34 @@ class User(AbstractUser):
     @property
     def is_admin(self):
         return self.roles.exists()
+
+
+class UserRegistrationLink(CreateUpdateDateMixin, UUIDModelMixin, models.Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='registration_links'
+    )
+    # Even though user has an association attached to, we still it here for backend filter
+    association = models.ForeignKey(
+        'associations.Association',
+        on_delete=models.CASCADE,
+        related_name='registration_links'
+    )
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='authored_registration_links'
+    )
+    expiration_date = models.DateTimeField(null=False, blank=False)
+    send_time = models.DateTimeField(null=True, blank=True)
+    is_deactivated = models.BooleanField(default=False)
+    link = models.URLField(null=False, blank=False)
+
+    def save(self, *args, **kwargs):
+        self.link = f'{settings.API_HOST}/{str(self.association_id)}/{str(self.user_id)}/{str(self.id)}'
+
+        return super().save(*args, **kwargs)
+
+    def is_active(self):
+        return not self.is_deactivated and timezone.now() < self.expiration_date

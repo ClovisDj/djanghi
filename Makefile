@@ -48,4 +48,4 @@ clear-psql:
 # Use this command to pre-populate the db
 load-data:
 	$(MAKE) migrate
-	$(user-shell) sh -c "./manage.py loaddata init_data.json --exclude profiles.UserRole"
+	$(user-shell) sh -c "./manage.py loaddata init_data.json --exclude profiles.UserRole -e contenttypes"
