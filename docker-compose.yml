@@ -1,4 +1,21 @@
 version: '3.9'
+
+x-common-environment: &common-environ
+  PYTHONDONTWRITEBYTECODE: 1
+  ENVIRONMENT:
+  SECRET_KEY:
+  POSTGRES_USER:
+  POSTGRES_PASSWORD:
+  POSTGRES_HOST:
+  POSTGRES_DB:
+  DEBUG:
+  DB_PORT:
+  ALLOWED_HOSTS:
+  ACCESS_TOKEN_LIFETIME:
+  REFRESH_TOKEN_LIFETIME:
+  JWT_SECRET_KEY:
+  AUTH_HEADER_TYPES:
+
 services:
 
   psql:
@@ -6,7 +23,7 @@ services:
       - "5432:5432"
     image: postgres:13
     volumes:
-      - /data/djanghi/psql:/var/lib/postgresql
+      - data-psql:/var/lib/postgresql/data
       - ./entrypoints/init-database.sh:/docker-entrypoint-initdb.d/init-database.sh
     environment:
       - POSTGRES_USER=djanghi-user
@@ -35,12 +52,7 @@ services:
     depends_on:
       - psql
     environment:
-      - PYTHONDONTWRITEBYTECODE=1
-      - ENV
-      - SECRET_KEY
-      - SERVICE=runserver
-      - LOG_LEVEL
-      - FORCE_DEBUG
+      <<: *common-environ
 
   django-shell:
     build:
@@ -51,6 +63,8 @@ services:
       - psql
     volumes:
       - .:/app
+    environment:
+      <<: *common-environ
     networks:
       default:
         aliases:
@@ -58,6 +72,10 @@ services:
       djanghi-portal:
         aliases:
           - apps-project-shell
+
+volumes:
+  data-psql:
+    driver: local
 
 networks:
   djanghi-portal:

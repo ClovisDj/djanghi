@@ -16,37 +16,50 @@ import environ
 
 from glob import glob
 
-ENV = environ.Env()
 
-GDAL_LIBRARY_PATH = glob('/usr/lib/libgdal.so.*')[0]
-GEOS_LIBRARY_PATH = glob('/usr/lib/libgeos_c.so.*')[0]
-
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Read environment variables from correct location
+environ.Env.read_env(env_file=f'{BASE_DIR}/.env')
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
+ENV = environ.Env()
+
+ENVIRONMENT = ENV('ENVIRONMENT')
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-glu9z^w-#81d&^6=f34l7(jzch5$5y0_8&^6q53)w8xqpig7(0'
+SECRET_KEY = ENV('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = ENV.bool('DEBUG')
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ENV.list('ALLOWED_HOSTS')
 
-# Application definition
+# Environment specific hosts
+API_HOST = ENV.str('API_HOST')
+FRONT_END_HOST = ENV('FRONT_END_HOST')
 
-INSTALLED_APPS = [
+BASE_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'apps.profiles',
 ]
+
+PACKAGE_APPS = [
+    'django_filters',
+    'rest_framework',
+    'rest_framework_json_api',
+    'django_extensions',
+]
+
+DJANGHI_APPS = [
+    'apps.profiles',
+    'apps.associations',
+]
+
+INSTALLED_APPS = BASE_APPS + PACKAGE_APPS + DJANGHI_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -56,6 +69,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'apps.extensions.backend.CustomAuthenticationMiddleware',
 ]
 
 ROOT_URLCONF = 'apps.urls'
@@ -76,6 +90,11 @@ TEMPLATES = [
     },
 ]
 
+FIXTURE_DIRS = [
+    f'{BASE_DIR}/tests/fixtures',
+]
+
+
 WSGI_APPLICATION = 'apps.wsgi.application'
 
 
@@ -83,12 +102,14 @@ WSGI_APPLICATION = 'apps.wsgi.application'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 DATABASES = {
-    'default': ENV.db(default='psql://djanghi-user:password@psql:5432/djanghi-db'),
+    'default': ENV.db(
+        default=f"{ENV('POSTGRES_HOST')}:"
+                f"//{ENV('POSTGRES_USER')}:"
+                f"{ENV('POSTGRES_PASSWORD')}@"
+                f"{ENV('POSTGRES_HOST')}:"
+                f"{ENV('DB_PORT')}/{ENV('POSTGRES_DB')}"
+    ),
 }
-
-
-# Password validation
-# https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -129,3 +150,14 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+GDAL_LIBRARY_PATH = glob('/usr/lib/libgdal.so.*')[0]
+GEOS_LIBRARY_PATH = glob('/usr/lib/libgeos_c.so.*')[0]
+
+DEFAULT_REGISTRATION_LINK_LIKE = 10     # 10 Days
+
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+AUTH_USER_MODEL = 'profiles.User'
+AUTHENTICATION_BACKENDS = ['apps.extensions.backend.DjanghiModelBackend']

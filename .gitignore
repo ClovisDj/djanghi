@@ -7,3 +7,7 @@ __pycache__/
 scratch.py
 
 pyvenv.cfg
+.env
+.coverage
+.pytest_cache
+log_file.log
