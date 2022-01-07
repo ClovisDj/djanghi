@@ -74,6 +74,7 @@ class User(AbstractUser):
     date_of_birth = models.DateField(null=True, blank=True)
     city_of_birth = models.CharField(max_length=100, null=True, blank=True)
     country_of_birth = models.CharField(max_length=100, null=True, blank=True)
+    address = models.CharField(max_length=300, null=True, blank=True)
 
     groups = models.ManyToManyField(
         CustomGroup,
@@ -207,6 +208,9 @@ class UserRegistrationLink(CreateUpdateDateMixin, UUIDModelMixin, models.Model):
     send_time = models.DateTimeField(null=True, blank=True)
     is_deactivated = models.BooleanField(default=False)
     link = models.URLField(null=False, blank=False)
+
+    class Meta:
+        ordering = ['-updated_at']
 
     def save(self, *args, **kwargs):
         self.link = f'{settings.API_HOST}/{str(self.association_id)}/{str(self.user_id)}/{str(self.id)}'

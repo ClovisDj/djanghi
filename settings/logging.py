@@ -27,21 +27,15 @@ LOGGING = {
             'class': 'logging.StreamHandler',
             'formatter': 'timestamp',
         },
-        'file': {
-            'level': 'INFO',
-            'class': 'logging.FileHandler',
-            'filename': ENV.str('LOG_FILE_PATH'),
-            'formatter': 'timestamp',
-        },
     },
     'root': {
-        'handlers': ['console', 'file'],
+        'handlers': ['console'],
         'level': 'INFO',
         'propagate': True,
     },
     'loggers': {
         'django': {
-            'handlers': ['console', 'file'],
+            'handlers': ['console'],
             'level': ENV.str('DJANGO_LOG_LEVEL'),
             'propagate': True,
         },

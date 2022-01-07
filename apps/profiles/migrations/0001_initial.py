@@ -39,6 +39,7 @@ class Migration(migrations.Migration):
                 ('date_of_birth', models.DateField(blank=True, null=True)),
                 ('city_of_birth', models.CharField(blank=True, max_length=100, null=True)),
                 ('country_of_birth', models.CharField(blank=True, max_length=100, null=True)),
+                ('address', models.CharField(blank=True, max_length=300, null=True)),
                 ('association', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='users', to='associations.association')),
             ],
             options={
@@ -77,6 +78,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 'abstract': False,
+                'ordering': ['-updated_at'],
             },
         ),
         migrations.CreateModel(

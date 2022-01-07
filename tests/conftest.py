@@ -88,6 +88,7 @@ def inactive_abc_user(user_create_data, association_abc):
     user_create_data['email'] = 'abc.user.2@abc.com'
     user_create_data['association_id'] = association_abc.id
     user_create_data['is_active'] = False
+    user_create_data['is_registered'] = False
     return User.objects.create_user(
         'abc.user.1@abc.com',
         **user_create_data
@@ -99,7 +100,19 @@ def xyz_user(user_create_data, association_xyz):
     user_create_data['email'] = 'xyz.user.1@xyz.com'
     user_create_data['association_id'] = association_xyz.id
     return User.objects.create_user(
-        'abc.user.1@abc.com',
+        user_create_data['email'],
+        **user_create_data
+    )
+
+
+@pytest.fixture
+def inactive_xyz_user(user_create_data, association_xyz):
+    user_create_data['email'] = 'xyz.user.2@xyz.com'
+    user_create_data['association_id'] = association_xyz.id
+    user_create_data['is_active'] = False
+    user_create_data['is_registered'] = False
+    return User.objects.create_user(
+        user_create_data['email'],
         **user_create_data
     )
 

@@ -133,8 +133,8 @@ class UserAdminModelSerializer(serializers.ModelSerializer):
 
 class UserRegistrationModelSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(write_only=True)
-    first_name = serializers.CharField(required=False, allow_null=True)
-    last_name = serializers.CharField(required=False, allow_null=True)
+    first_name = serializers.CharField(write_only=True, required=False)
+    last_name = serializers.CharField(write_only=True, required=False)
 
     is_active = serializers.BooleanField(read_only=True)
 
@@ -166,29 +166,54 @@ class UserRegistrationModelSerializer(serializers.ModelSerializer):
         super().__init__(*args, **kwargs)
 
         self.request = getattr(self, 'context', {}).get('request')
+        self.__user = None
 
-    def create(self, validated_data):
+    def validate_email(self, email):
+        try:
+            user = User.objects.for_association(self.request.user.association).get(email=email)
+        except User.DoesNotExist:
+            return email
+
+        self.__user = user
+        if user.is_registered:
+            raise serializers.ValidationError('This user is already registered')
+
+        return email
+
+    def get_or_create_user(self, validated_data):
         email = validated_data.pop('email')
-        user_qs = User.objects.for_association(self.request.user.association).filter(email=email)
-        if user_qs.exists():
-            user = user_qs.first()
-            user.registration_links.all().delete()
-        else:
-            user_create_data = {
-                'email': email,
-                'first_name': validated_data.pop('first_name', ''),
-                'last_name': validated_data.pop('first_name', ''),
-                'association': self.request.user.association,
-                'is_active': False,
-                'password': 'password'
-            }
-            user = User.objects.create_user(email, **user_create_data)
+        first_name = validated_data.pop('first_name', '')
+        last_name = validated_data.pop('last_name', '')
+        if self.__user:
+            return self.__user, validated_data
 
-        validated_data['expiration_date'] = timezone.now() + datetime.timedelta(
+        user_create_data = {
+            'email': email,
+            'first_name': first_name,
+            'last_name': last_name,
+            'association': self.request.user.association,
+            'is_active': False,
+            'password': 'password'
+        }
+        return User.objects.create_user(email, **user_create_data), validated_data
+
+    def generate_expiration_date(self):
+        return timezone.now() + datetime.timedelta(
             days=self.request.user.association.registration_link_life
         )
+
+    def create(self, validated_data):
+        user, validated_data = self.get_or_create_user(validated_data)
+
+        validated_data['expiration_date'] = self.generate_expiration_date()
         validated_data['user'] = user
         validated_data['author'] = self.request.user
         validated_data['association'] = self.request.user.association
 
         return UserRegistrationLink.objects.create(**validated_data)
+
+    def update(self, instance, validated_data):
+        instance.expiration_date = self.generate_expiration_date()
+        instance.save()
+
+        return instance
