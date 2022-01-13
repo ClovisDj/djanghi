@@ -77,7 +77,9 @@ ROOT_URLCONF = 'apps.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            f'{BASE_DIR}/apps/templates',
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -89,6 +91,12 @@ TEMPLATES = [
         },
     },
 ]
+
+STATICFILES_DIRS = [
+    f'{BASE_DIR}/apps/statics',
+]
+
+STATIC_ROOT = '/var/djanghi/static'
 
 FIXTURE_DIRS = [
     f'{BASE_DIR}/tests/fixtures',

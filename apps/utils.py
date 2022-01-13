@@ -2,6 +2,8 @@ import uuid
 
 from django.db import models
 from rest_framework.exceptions import PermissionDenied
+from rest_framework_simplejwt.exceptions import AuthenticationFailed
+from rest_framework_simplejwt.tokens import RefreshToken
 
 
 class UUIDModelMixin(models.Model):
@@ -32,10 +34,15 @@ def extract_user_from_request_token(request):
 
     try:
         is_authenticated = CustomJWTAuthentication().authenticate(request)
-    except PermissionDenied:
+    except AuthenticationFailed:
         return None
 
     if is_authenticated:
         return is_authenticated[0]
 
     return None
+
+
+def _force_login(user):
+    refresh = RefreshToken.for_user(user)
+    return str(refresh), str(refresh.access_token)

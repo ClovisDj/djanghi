@@ -37,8 +37,9 @@ migrate:
 down:
 	docker-compose down
 
+n := -n2
 pytest:
-	$(user-shell) bash -c "pytest --cov=apps --cov-report=term"
+	$(user-shell) bash -c "pytest $(n) --cov=apps --cov-report=term"
 
 # Use caution with the below command since it will wipe out your local postgres db
 clear-psql:

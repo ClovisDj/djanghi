@@ -213,9 +213,10 @@ class UserRegistrationLink(CreateUpdateDateMixin, UUIDModelMixin, models.Model):
         ordering = ['-updated_at']
 
     def save(self, *args, **kwargs):
-        self.link = f'{settings.API_HOST}/{str(self.association_id)}/{str(self.user_id)}/{str(self.id)}'
+        self.link = f'{settings.API_HOST}/activate/{str(self.association_id)}/{str(self.user_id)}/{str(self.id)}'
 
         return super().save(*args, **kwargs)
 
+    @property
     def is_active(self):
         return not self.is_deactivated and timezone.now() < self.expiration_date

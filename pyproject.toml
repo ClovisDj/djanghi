@@ -37,19 +37,18 @@ watchtower = "==0.5.5"
 
 [tool.poetry.dev-dependencies]
 bandit = "~1.6"
-coverage = "==4.5.1"
 django-mock-queries = "~2.1"
 django-pycharm-breakpoint = "~0.2.0"
 fpdf = "==1.7.2"
 freezegun = "~0.3"
 pillow = "~7"
-prospector = {git = "git://github.com/shipchain/prospector.git", rev = "72e9b88a604217584d227282d2e484de1482efca"}
 pyexcel = "~0.5"
 pyexcel-xls = "~0.5"
 pyexcel-xlsx = "~0.5"
-pyrasite = {git = "git://github.com/diamond-lizard/pyrasite.git", rev = "d1e2301fe60ab03e99a51ca1b105f7c3368b1a33"}
-pytest-cov = "~2.6"
-pytest-django = "~3.5"
+pytest = ">=5.4"
+pytest-xdist = "~2.5"
+pytest-cov = "~3"
+pytest-django = "~4.5"
 pytest-mock = "^1.10"
 responses = "~0.12"
 safety = "^1.8"

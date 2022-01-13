@@ -73,10 +73,13 @@ class CustomJWTAuthentication(JWTAuthentication):
 
     def authenticate(self, request):
         try:
-            auth = super().authenticate(request)
-        except AuthenticationFailed:
+            header = self.get_header(request)
+            raw_token = self.get_raw_token(header)
+            validated_token = self.get_validated_token(raw_token)
+
+            return self.get_user(validated_token), validated_token
+        except (AttributeError, AuthenticationFailed):
             return None
-        return auth
 
     def get_validated_token(self, raw_token):
         """
@@ -88,7 +91,7 @@ class CustomJWTAuthentication(JWTAuthentication):
             except TokenError:
                 pass
 
-        raise PermissionDenied()
+        raise AuthenticationFailed()
 
 
 class CustomJsonApiPageNumberPagination(JsonApiPageNumberPagination):

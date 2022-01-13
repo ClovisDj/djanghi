@@ -33,6 +33,10 @@ class TestUserLoginView:
         assert alice_xyz_user.email == user_alice.email
         assert alice_xyz_user.association != user_alice.association
 
+    def test_endpoint_allows_only_post_method(self, base_client, user_alice):
+        response = base_client.get(self.login_url)
+        assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
+
     def test_cannot_login_without_a_valid_association(self, base_client, user_alice):
         response = base_client.post(self.login_url, {
             'email': user_alice.email,

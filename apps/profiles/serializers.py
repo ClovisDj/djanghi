@@ -2,6 +2,8 @@ import datetime
 
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import update_last_login
+from django import forms
+from django.core.exceptions import ValidationError
 from django.utils import timezone
 from rest_framework_json_api import serializers
 from rest_framework import exceptions
@@ -217,3 +219,54 @@ class UserRegistrationModelSerializer(serializers.ModelSerializer):
         instance.save()
 
         return instance
+
+
+class UserRegistrationForm(forms.Form):
+    first_name = forms.CharField(max_length=150, required=True, widget=forms.TextInput(attrs={
+        'class': 'form-control',
+        'placeholder': "First Name",
+        'id': "first_name"
+    }))
+    last_name = forms.CharField(max_length=150, required=True, widget=forms.TextInput(attrs={
+        'class': 'form-control',
+        'placeholder': "Last Name",
+        'id': "last_name"
+    }))
+    password = forms.CharField(required=True, min_length=6, widget=forms.TextInput(attrs={
+        'type': 'password',
+        'class': 'form-control',
+        'placeholder': "Your Password",
+        'name': "password",
+        'id': "password"
+    }))
+    password_verification = forms.CharField(required=True, min_length=6, widget=forms.TextInput(attrs={
+        'type': 'password',
+        'class': 'form-control',
+        'placeholder': " Re-enter Your Password",
+        'name': "password Verification",
+        'id': "password_verification"
+    }))
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        if cleaned_data.get('password') != cleaned_data.get('password_verification'):
+            self.add_error('password_verification', 'Password mis-match')
+
+        return cleaned_data
+
+    @staticmethod
+    def activate_user(user, cleaned_data):
+        user.first_name = cleaned_data['first_name']
+        user.last_name = cleaned_data['last_name']
+        user.is_active = True
+        user.is_registered = True
+        user.set_password(cleaned_data['password'])
+        user.save()
+        return user
+
+    @staticmethod
+    def deactivate_link(link):
+        link.is_deactivated = True
+        link.save()
+        return link
