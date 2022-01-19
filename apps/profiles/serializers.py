@@ -180,6 +180,7 @@ class UserRegistrationModelSerializer(serializers.ModelSerializer):
         if user.is_registered:
             raise serializers.ValidationError('This user is already registered')
 
+        user.registration_links.all().delete()
         return email
 
     def get_or_create_user(self, validated_data):
@@ -194,7 +195,8 @@ class UserRegistrationModelSerializer(serializers.ModelSerializer):
             'first_name': first_name,
             'last_name': last_name,
             'association': self.request.user.association,
-            'is_active': False,
+            'is_active': True,
+            'is_registered': False,
             'password': 'password'
         }
         return User.objects.create_user(email, **user_create_data), validated_data

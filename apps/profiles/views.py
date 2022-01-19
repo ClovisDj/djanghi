@@ -5,6 +5,7 @@ from django.http import HttpResponseNotFound, HttpResponseRedirect
 from django.http.response import HttpResponsePermanentRedirect
 from django.shortcuts import render
 from django.urls import reverse
+from django.utils import timezone
 from django.views import View
 
 from rest_framework import mixins, permissions
@@ -67,18 +68,19 @@ class UserRegistrationView(View):
         super().__init__(*args, **kwargs)
 
         self.registration_link = None
+        self.association = None
 
     def request_is_valid(self, association_id, user_id, registration_id):
         if not is_valid_uuid(association_id) or not is_valid_uuid(user_id) or not is_valid_uuid(registration_id):
             return False
 
         try:
-            association = Association.objects.get(id=association_id)
+            self.association = Association.objects.get(id=association_id)
         except Association.DoesNotExist:
             return False
 
         try:
-            user = User.objects.for_association(association).get(id=user_id)
+            user = User.objects.for_association(self.association).get(id=user_id)
         except User.DoesNotExist:
             return False
 
@@ -93,12 +95,20 @@ class UserRegistrationView(View):
         self.registration_link = registration_link
         return True
 
+    def get_context(self):
+        return {
+            'association': self.association,
+            'year': str(timezone.now().year)
+        }
+
     def get(self, request, *args, **kwargs):
         if not self.request_is_valid(kwargs.get('association'), kwargs.get('user'),
                                      kwargs.get('registration_link')):
             return HttpResponseNotFound()
 
-        return render(request, self.template_name, {'form': self.form_class()})
+        context = {**self.get_context(), 'form': self.form_class()}
+        # context.update()
+        return render(request, self.template_name, context=context)
 
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST)

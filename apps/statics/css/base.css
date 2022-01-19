@@ -14,108 +14,15 @@ html{
 }
 
 body{
-  /*font-family: 'Droid Serif', serif !important;*/
   overflow-x: hidden;
   position: relative;
   margin: 0;
-  padding-bottom: 2em;
-  min-height: 100%;
-}
-
-/*html, body {*/
-/*    background: -webkit-linear-gradient(rgba(0, 104, 178,0), rgba(0, 104, 178,1)); !* For Safari 5.1 to 6.0 *!*/
-/*    background: -o-linear-gradient(rgba(0, 104, 178,0), rgba(0, 104, 178,1)); !* For Opera 11.1 to 12.0 *!*/
-/*    background: -moz-linear-gradient(rgba(0, 104, 178,0), rgba(0, 104, 178,1)); !* For Firefox 3.6 to 15 *!*/
-/*    background: linear-gradient(rgba(0, 104, 178,0), rgba(0, 104, 178,1)); !* Standard syntax (must be last) *!*/
-/*}*/
-
-/*navbar styling*/
-.navbar-default{
-  /*font-family: 'Iceland';*/
-  background-color: #28a8e5e6 !important;
-  top: 0px;
-  /*height: 50px;*/
-}
-
-.navbar-toggle {
-  padding: 5px 8px !important;
-}
-
-.navbar .navbar-brand {
-  font-family: 'Iceland';
-  font-size: 1.8em;
-  display: block;
 }
 
 .main{
   padding-top: 5em;
   min-height: 100%;
   min-height: 100vh;
-}
-
-.navbar-default .navbar-nav .separator{
-  width: 0px;
-  height: 40px;
-  margin: 5px 0px 5px 0px;
-  border-right: 1px solid rgba(0, 104, 178,0.8);
-  float: left;
-}
-
-.navbar-default .navbar-nav .glyphicon{
-  color: rgba(10, 80, 255, 1);
-}
-
-.navbar-default .navbar-nav #active{
-  color: #00FC00;
-}
-
-.navbar-default .icon-bar {
-  display: block;
-  width: 25px;
-  height: 2px;
-  margin: 4px;
-  background-color: rgba(0, 104, 178,1);
-  border-radius: 1px;
-}
-
-.navbar .navbar-header .navbar-brand{
-  color: rgb(255, 96, 5);
-}
-
-.navbar .navbar-header >a:hover{
-  color: #FFF;
-}
-
-.navbar .collapse .nav li > a{
-  color: #FFF;
-}
-
-.navbar .collapse .nav li > a:hover{
-  background-color: rgba(237, 243, 255, 1);
-  color: rgba(0, 104, 178,1);
-}
-
-.navbar .collapse .nav li{
-  display: block;
-}
-
-.navbar .collapse .nav .dropdown .dropdown-menu li > a{
-  color: black;
-}
-
-.navbar .collapse .nav #scores{
-  text-decoration: none;
-  display:inline-block;
-  height: 2.7em;
-  margin: 6px 10px;
-  padding: 5px 15px;
-  border: 2px solid rgba(0, 104, 178,0);
-}
-
-@media (max-width: 767px){
-  .navbar-nav .dropdown-menu li > a {
-    background-color: white !important;
-  }
 }
 
 /*footer styling*/
@@ -136,7 +43,6 @@ body{
 .footer .row .media-body h5{
   display: block;
   margin: 0 auto;
-  text-align: right;
   color: #FFF;
 }
 
@@ -149,6 +55,6 @@ body{
 }
 
 .footer .row .media .media-right img{
-  height: 15px;
+  /*height: 15px;*/
   width: 30px;
 }
