@@ -1,0 +1,60 @@
+/*body styling*/
+html{
+  height: 100%;
+  width: 100%;
+  box-sizing: border-box;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
+body{
+  overflow-x: hidden;
+  position: relative;
+  margin: 0;
+}
+
+.main{
+  padding-top: 5em;
+  min-height: 100%;
+  min-height: 100vh;
+}
+
+/*footer styling*/
+.footer {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: 0.5rem;
+  background-color: #010921;
+  text-align: center;
+}
+
+.footer .row{
+  position: relative;
+}
+
+.footer .row .media-body h5{
+  display: block;
+  margin: 0 auto;
+  color: #FFF;
+}
+
+.footer .row .media-body{
+  padding: 8px;
+}
+
+.footer .row .media .media-right{
+  padding: 8px 5px 3px 5px;
+}
+
+.footer .row .media .media-right img{
+  /*height: 15px;*/
+  width: 30px;
+}
