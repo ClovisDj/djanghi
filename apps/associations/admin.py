@@ -1,3 +1,10 @@
 from django.contrib import admin
 
-# Register your models here.
+from apps.associations.models import Association
+
+
+class AssociationAdmin(admin.ModelAdmin):
+    pass
+
+
+admin.site.register(Association, AssociationAdmin)

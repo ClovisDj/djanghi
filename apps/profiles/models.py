@@ -23,7 +23,7 @@ class UserRole(CreateUpdateDateMixin, UUIDModelMixin, models.Model):
     objects = RoleManager()
 
     def __str__(self):
-        return '[(%s) %s ID: %s]' % (self.value, self.__class__.__name__, self.pk)
+        return '[(%s) %s ID: %s]' % (self.value, self.__class__.__name__, self.description)
 
 
 class CustomGroup(Group):
