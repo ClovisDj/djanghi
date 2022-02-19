@@ -34,6 +34,8 @@ DEBUG = ENV.bool('DEBUG')
 
 ALLOWED_HOSTS = ENV.list('ALLOWED_HOSTS')
 
+CORS_ALLOWED_ORIGINS = ENV.list('CORS_ALLOWED_ORIGINS')
+
 # Environment specific hosts
 API_HOST = ENV.str('API_HOST')
 FRONT_END_HOST = ENV.str('FRONT_END_HOST')
@@ -52,6 +54,7 @@ PACKAGE_APPS = [
     'rest_framework',
     'rest_framework_json_api',
     'django_extensions',
+    'corsheaders',
 ]
 
 DJANGHI_APPS = [
@@ -61,7 +64,7 @@ DJANGHI_APPS = [
 
 INSTALLED_APPS = BASE_APPS + PACKAGE_APPS + DJANGHI_APPS
 
-MIDDLEWARE = [
+BASE_MIDDLEWARES = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -69,8 +72,18 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+]
+
+PACKAGE_MIDDLEWARES = [
+    'corsheaders.middleware.CorsMiddleware',
+]
+
+CUSTOM_MIDDLEWARES = [
     'apps.extensions.backend.CustomAuthenticationMiddleware',
 ]
+
+MIDDLEWARE = BASE_MIDDLEWARES + PACKAGE_MIDDLEWARES + CUSTOM_MIDDLEWARES
 
 ROOT_URLCONF = 'apps.urls'
 

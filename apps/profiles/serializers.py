@@ -3,7 +3,6 @@ import datetime
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import update_last_login
 from django import forms
-from django.core.exceptions import ValidationError
 from django.utils import timezone
 from rest_framework_json_api import serializers
 from rest_framework import exceptions
@@ -12,6 +11,7 @@ from rest_framework_simplejwt.settings import api_settings
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import User, UserRegistrationLink
+from ..associations.serializers import AssociationModelSerializer
 
 
 class LoginSerializer(TokenObtainSerializer):
@@ -84,8 +84,15 @@ class UserModelSerializer(serializers.ModelSerializer):
             'roles',
         )
 
+    class JSONAPIMeta:
+        included_resources = ('association', )
 
-class UserAdminModelSerializer(serializers.ModelSerializer):
+    included_serializers = {
+        'association': AssociationModelSerializer,
+    }
+
+
+class UserAdminModelSerializer(UserModelSerializer):
     is_admin = serializers.SerializerMethodField()
     is_full_admin = serializers.SerializerMethodField()
     is_payment_manager = serializers.SerializerMethodField()
