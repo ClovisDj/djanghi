@@ -19,6 +19,15 @@ class Association(CreateUpdateDateMixin, UUIDModelMixin, models.Model):
     # Settings
     email_from = models.EmailField(null=False, unique=True)
     registration_link_life = models.IntegerField(default=settings.DEFAULT_REGISTRATION_LINK_LIKE)
+    is_active = models.BooleanField(default=True)
+
+    last_updated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='updated_associations',
+        null=True,
+        blank=True
+    )
 
     def __str__(self):
         return '[%s] %s object (%s)' % (self.label, self.__class__.__name__, self.pk)
@@ -27,6 +36,9 @@ class Association(CreateUpdateDateMixin, UUIDModelMixin, models.Model):
 class MemberContributionField(CreateUpdateDateMixin, UUIDModelMixin, models.Model):
     name = models.CharField(max_length=30, null=False)
     is_required = models.BooleanField(default=True)
+    required_amount = models.FloatField(null=True, blank=True)
+    member_can_opt_in = models.BooleanField(default=False)
+
     association = models.ForeignKey(
         Association,
         on_delete=models.CASCADE,
@@ -40,3 +52,49 @@ class MemberContributionField(CreateUpdateDateMixin, UUIDModelMixin, models.Mode
                 name='unique_contribution_name_by_association'
             )
         ]
+
+
+class Meeting(CreateUpdateDateMixin,
+              UUIDModelMixin,
+              models.Model):
+
+    scheduled_date = models.DateField(blank=False, null=False, db_index=True)
+    scheduled_time = models.TimeField(blank=True, null=True)
+    address = models.CharField(max_length=500, null=True, blank=True)
+
+    scope = models.TextField(blank=True, null=True)
+    rapport = models.TextField(blank=True, null=True)
+
+    host = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='hosted_meetings',
+        null=True,
+        blank=True
+    )
+    lead = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='leaded_meetings',
+        null=True,
+        blank=True
+    )
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='authored_meetings'
+    )
+    last_updated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='updated_meetings'
+    )
+    association = models.ForeignKey(
+        Association,
+        on_delete=models.CASCADE,
+        related_name='meetings'
+    )
+    participants = models.ManyToManyField(settings.AUTH_USER_MODEL)
+
+    class Meta:
+        ordering = ['-scheduled_date']

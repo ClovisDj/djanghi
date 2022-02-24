@@ -1,7 +1,6 @@
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.middleware import AuthenticationMiddleware
 from django.contrib.auth.models import AnonymousUser
-from rest_framework.exceptions import PermissionDenied
 from rest_framework.filters import BaseFilterBackend
 from rest_framework_json_api.pagination import JsonApiPageNumberPagination
 from rest_framework_simplejwt.authentication import JWTAuthentication

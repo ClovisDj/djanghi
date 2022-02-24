@@ -60,6 +60,7 @@ PACKAGE_APPS = [
 DJANGHI_APPS = [
     'apps.profiles',
     'apps.associations',
+    'apps.payments',
 ]
 
 INSTALLED_APPS = BASE_APPS + PACKAGE_APPS + DJANGHI_APPS

@@ -40,6 +40,7 @@ class Migration(migrations.Migration):
                 ('city_of_birth', models.CharField(blank=True, max_length=100, null=True)),
                 ('country_of_birth', models.CharField(blank=True, max_length=100, null=True)),
                 ('address', models.CharField(blank=True, max_length=300, null=True)),
+                ('sex', models.CharField(choices=[('M', 'Male'), ('F', 'Female'), ('F', 'Female'), ('U', 'Unspecified')], default='U', max_length=2)),
                 ('association', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='users', to='associations.association')),
             ],
             options={
