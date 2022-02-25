@@ -62,7 +62,7 @@ class AssociationFilterBackend(BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
         # At this point of the process any requester should be authenticated
         # and the user object properly attached to the request
-        if request.user and queryset.exists() and hasattr(queryset.first(), 'association'):
+        if request.user and queryset.exists() and hasattr(queryset.model, 'association'):
             return queryset.filter(association_id=request.user.association_id)
 
         return queryset

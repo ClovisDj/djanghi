@@ -2,12 +2,11 @@ from django.urls import path
 from rest_framework import routers
 from rest_framework_simplejwt.views import TokenRefreshView
 
-from apps.profiles.views import ApiLoginView, UserModelViewSet, UserRegistrationViewSet, UserRegistrationView
+from apps.profiles.views import ApiLoginView, UserRegistrationViewSet, UserRegistrationView
 
 app_name = 'profiles'
 router = routers.SimpleRouter(trailing_slash=False)
 
-router.register(r'users', UserModelViewSet, basename='users')
 router.register(r'registrations', UserRegistrationViewSet, basename='registrations')
 
 urlpatterns = [

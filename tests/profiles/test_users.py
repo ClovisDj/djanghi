@@ -5,11 +5,11 @@ from tests import ActMixin
 
 
 class TestUserModelViewSet(ActMixin):
-    list_url = reverse('profiles_urls:users-list')
+    list_url = reverse('users-list')
 
     @staticmethod
     def detail_url(uu_id):
-        return reverse('profiles_urls:users-detail', args=(str(uu_id), ))
+        return reverse('users-detail', args=(str(uu_id), ))
 
     def test_an_unauthenticated_user_cannot_list_any_users(self, base_client, abc_user, user_alice):
         self.act(self.list_url, base_client, method='get', status_code=status.HTTP_401_UNAUTHORIZED)

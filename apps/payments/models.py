@@ -43,4 +43,3 @@ class MembershipPayment(PaymentBase):
         on_delete=models.CASCADE,
         related_name='membership_payments'
     )
-

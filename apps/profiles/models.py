@@ -195,6 +195,11 @@ class User(AbstractUser):
         user_roles_set = self.user_roles_set_by('value')
         return bool(roles_set_by_value.issubset(user_roles_set))
 
+    def has_min_one_role(self, *roles):
+        roles_object_set = self.get_roles(*roles)
+        user_roles_set = set(self.roles.all())
+        return bool(roles_object_set.intersection(user_roles_set))
+
     @property
     def is_full_admin(self):
         return self.has_roles(FULL_ADMIN)
