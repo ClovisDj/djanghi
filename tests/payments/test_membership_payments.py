@@ -95,6 +95,18 @@ class TestMembershipPaymentsViewSet(ActMixin):
             status_code=status.HTTP_403_FORBIDDEN
         )
 
+    def test_authenticated_user_cannot_read_someone_else_membership_payment(self, authenticated_abc_user_client,
+                                                                            abc_user, user_alice,
+                                                                            abc_user_assurance_payment):
+        assert not abc_user.is_admin
+
+        self.act(
+            f'{self.get_list_url(user_alice)}/{str(abc_user_assurance_payment.id)}',
+            authenticated_abc_user_client,
+            method='get',
+            status_code=status.HTTP_404_NOT_FOUND
+        )
+
     def test_authenticated_user_can_list_only_his_membership_payments(self, authenticated_abc_user_client, abc_user,
                                                                       abc_user_assurance_payment,
                                                                       abc_user_inscription_payment,
