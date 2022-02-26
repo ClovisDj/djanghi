@@ -1,6 +1,7 @@
 from django.urls import reverse
 from rest_framework import status
 
+from apps.payments.models import MembershipPaymentSatus
 from apps.profiles import roles
 from tests import ActMixin
 
@@ -45,7 +46,7 @@ class TestMembershipPaymentsViewSet(ActMixin):
                                                                              abc_user, user_alice, abc_payments_type):
         abc_user.add_roles(roles.PAYMENT_MANAGER)
 
-        self.act(
+        res = self.act(
             self.get_list_url(user_alice),
             authenticated_abc_user_client,
             data={
@@ -55,6 +56,8 @@ class TestMembershipPaymentsViewSet(ActMixin):
             method='post',
             status_code=status.HTTP_201_CREATED
         )
+        status_obj = MembershipPaymentSatus.objects.all()
+        print(res)
 
     def test_authenticated_full_admin_cannot_modify_a_membership_payment(self, authenticated_abc_user_client, abc_user,
                                                                          abc_user_assurance_payment):

@@ -44,3 +44,27 @@ class MembershipPayment(PaymentBase):
         on_delete=models.CASCADE,
         related_name='membership_payments'
     )
+
+
+class MembershipPaymentSatus(CreateUpdateDateMixin,
+                             UUIDModelMixin,
+                             models.Model):
+
+    current_value = models.FloatField(blank=False, null=False, default=0)
+    paid_percentage = models.FloatField(blank=True, null=True)
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='membership_payments_status'
+    )
+    membership_payment_type = models.ForeignKey(
+        'associations.MemberContributionField',
+        on_delete=models.CASCADE,
+        related_name='membership_payments_status'
+    )
+    association = models.ForeignKey(
+        'associations.Association',
+        on_delete=models.CASCADE,
+        related_name='membership_payments_status'
+    )

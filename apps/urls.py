@@ -17,16 +17,17 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework_nested import routers
 
-from apps.payments.views import MembershipPaymentModelViewSet
+from apps.payments.views import MembershipPaymentModelViewSet, MembershipPaymentStatusModelViewSet
 from apps.profiles.views import UserModelViewSet
 
 router = routers.SimpleRouter(trailing_slash=False)
 router.register(r'users', UserModelViewSet, basename='users')
 
 # Nested routes
-membership_payments_router = routers.NestedSimpleRouter(router, r'users', lookup='user')
-membership_payments_router.register(r'membership_payments', MembershipPaymentModelViewSet,
-                                    basename='membership-payments')
+users_nested_router = routers.NestedSimpleRouter(router, r'users', lookup='user')
+users_nested_router.register(r'membership_payments', MembershipPaymentModelViewSet, basename='membership-payments')
+users_nested_router.register(r'payments_status', MembershipPaymentStatusModelViewSet,
+                             basename='membership-payments-status')
 
 urlpatterns = [
     path('staff/', admin.site.urls),
@@ -34,4 +35,4 @@ urlpatterns = [
 ]
 
 urlpatterns += router.urls
-urlpatterns += membership_payments_router.urls
+urlpatterns += users_nested_router.urls

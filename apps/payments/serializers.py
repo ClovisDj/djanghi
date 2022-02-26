@@ -1,7 +1,7 @@
 from rest_framework_json_api import serializers
 
 from apps.associations.serializers import MemberContributionFieldModelSerializer
-from apps.payments.models import MembershipPayment
+from apps.payments.models import MembershipPayment, MembershipPaymentSatus
 from apps.profiles.serializers import UserModelSerializer
 
 
@@ -46,3 +46,10 @@ class MembershipPaymentModelSerializer(serializers.ModelSerializer):
         validated_data['association'] = self.request.user.association
 
         return super().create(validated_data)
+
+
+class MembershipPaymentSatusModelSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = MembershipPaymentSatus
+        fields = '__all__'
