@@ -35,5 +35,3 @@ urlpatterns = [
 
 urlpatterns += router.urls
 urlpatterns += membership_payments_router.urls
-
-print(urlpatterns)

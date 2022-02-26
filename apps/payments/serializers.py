@@ -14,12 +14,11 @@ class MembershipPaymentModelSerializer(serializers.ModelSerializer):
             'created_at',
             'updated_at',
             'membership_payment_type',
-            'author',
-        )
-        exclude = (
             'association',
+            'author',
             'user',
         )
+        fields = '__all__'
 
     class JSONAPIMeta:
         included_resources = ('membership_payment_type', 'author', )
@@ -33,6 +32,10 @@ class MembershipPaymentModelSerializer(serializers.ModelSerializer):
         super().__init__(*args, **kwargs)
 
         self.request = getattr(self, 'context', {}).get('request')
+
+        if self.instance or (self.request and self.request.method != 'POST'):
+            # This field is only required for payment creation
+            self.fields.pop('membership_payment_type_id', None)
 
     def extract_user_id_from_request(self):
         return self.request.parser_context['kwargs']['user_pk']

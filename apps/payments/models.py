@@ -19,6 +19,7 @@ class PaymentBase(CreateUpdateDateMixin,
     amount = models.FloatField(blank=False, null=False)
 
     class Meta:
+        ordering = ['-created_at']
         abstract = True
 
 

@@ -26,7 +26,7 @@ class AdminAccessPolicyPermission(BasePermission):
         from apps.profiles.models import User
 
         allowed_roles = getattr(view, 'allowed_admin_roles', [])
-        if allowed_roles:
+        if allowed_roles and request.user.is_admin:
             return isinstance(request.user, User) and request.user.has_min_one_role(*allowed_roles)
 
         return True
