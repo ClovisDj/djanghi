@@ -6,4 +6,5 @@ class PaymentsConfig(AppConfig):
     name = 'apps.payments'
 
     def ready(self):
+        # Import needed for signal to work
         import apps.payments.signals

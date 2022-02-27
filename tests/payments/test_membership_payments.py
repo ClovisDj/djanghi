@@ -27,6 +27,23 @@ class TestMembershipPaymentsViewSet(ActMixin):
             status_code=status.HTTP_403_FORBIDDEN
         )
 
+    def test_cannot_provide_a_negative_payment_amount(self, authenticated_abc_user_client,
+                                                      abc_user, user_alice, abc_payments_type):
+        abc_user.add_roles(roles.PAYMENT_MANAGER)
+
+        response_data = self.act(
+            self.get_list_url(user_alice),
+            authenticated_abc_user_client,
+            data={
+                'amount': -10.5,
+                'membership_payment_type_id': str(abc_payments_type[1].id)
+            },
+            method='post',
+            status_code=status.HTTP_400_BAD_REQUEST
+        ).json()
+
+        assert response_data['errors'][0]['detail'] == 'Should provide a positive value'
+
     def test_authenticated_full_admin_can_add_a_user_membership_payment(self, authenticated_abc_user_client, abc_user,
                                                                         user_alice, abc_payments_type):
         abc_user.add_roles(roles.FULL_ADMIN)
@@ -46,7 +63,7 @@ class TestMembershipPaymentsViewSet(ActMixin):
                                                                              abc_user, user_alice, abc_payments_type):
         abc_user.add_roles(roles.PAYMENT_MANAGER)
 
-        res = self.act(
+        self.act(
             self.get_list_url(user_alice),
             authenticated_abc_user_client,
             data={
@@ -56,8 +73,24 @@ class TestMembershipPaymentsViewSet(ActMixin):
             method='post',
             status_code=status.HTTP_201_CREATED
         )
-        status_obj = MembershipPaymentSatus.objects.all()
-        print(res)
+
+    def test_authenticated_payment_manager_can_add_a_user_cost_payment_type(self, authenticated_abc_user_client,
+                                                                            abc_user, user_alice, abc_payments_type):
+        abc_user.add_roles(roles.PAYMENT_MANAGER)
+
+        response_data = self.act(
+            self.get_list_url(user_alice),
+            authenticated_abc_user_client,
+            data={
+                'amount': 10.5,
+                'payment_type': 'COST',
+                'membership_payment_type_id': str(abc_payments_type[1].id)
+            },
+            method='post',
+            status_code=status.HTTP_201_CREATED
+        ).json()
+        assert response_data['data']['attributes']['amount'] == -10.5
+        assert response_data['data']['attributes']['payment_type'] == 'COST'
 
     def test_authenticated_full_admin_cannot_modify_a_membership_payment(self, authenticated_abc_user_client, abc_user,
                                                                          abc_user_assurance_payment):

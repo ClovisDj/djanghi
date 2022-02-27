@@ -37,6 +37,12 @@ class MembershipPaymentModelSerializer(serializers.ModelSerializer):
             # This field is only required for payment creation
             self.fields.pop('membership_payment_type_id', None)
 
+    @staticmethod
+    def validate_amount(amount):
+        if amount and amount < 0:
+            raise serializers.ValidationError('Should provide a positive value')
+        return amount
+
     def extract_user_id_from_request(self):
         return self.request.parser_context['kwargs']['user_pk']
 

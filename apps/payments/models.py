@@ -22,6 +22,12 @@ class PaymentBase(CreateUpdateDateMixin,
         ordering = ['-created_at']
         abstract = True
 
+    def save(self, *args, **kwargs):
+        if self.payment_type == self.COST and self.amount > 0:
+            self.amount = -1 * self.amount
+
+        super().save(*args, **kwargs)
+
 
 class MembershipPayment(PaymentBase):
     association = models.ForeignKey(

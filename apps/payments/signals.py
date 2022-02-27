@@ -12,8 +12,8 @@ def update_membership_payments_status(sender, instance, created, **kwargs):
             association_id=instance.association_id,
             membership_payment_type_id=instance.membership_payment_type_id
         )
-        status_object.current_value += round(instance.amount, 2) if instance.payment_type == MembershipPayment.PAYMENT \
-            else (-1) * round(instance.amount, 2)
+
+        status_object.current_value += round(instance.amount, 2)
 
         required_amount = status_object.membership_payment_type.required_amount
         if required_amount and required_amount > 0 and status_object.current_value > 0:
