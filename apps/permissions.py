@@ -41,3 +41,18 @@ class RegularUserActionPermissions(BasePermission):
                 return request.method.upper() in list(map(str.upper, allowed_actions))
 
         return True
+
+
+class RegularUserNestedRoutePermission(BasePermission):
+
+    @staticmethod
+    def is_user_nested_route(request):
+        return 'user_pk' in request.parser_context['kwargs']
+
+    def has_permission(self, request, view):
+        from apps.profiles.models import User
+
+        if isinstance(request.user, User) and not request.user.is_admin and self.is_user_nested_route(request):
+            return request.parser_context['kwargs']['user_pk'] == str(request.user.id)
+
+        return True

@@ -59,3 +59,10 @@ class MembershipPaymentSatusModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = MembershipPaymentSatus
         fields = '__all__'
+
+    class JSONAPIMeta:
+        included_resources = ('membership_payment_type', )
+
+    included_serializers = {
+        'membership_payment_type': MemberContributionFieldModelSerializer
+    }

@@ -51,6 +51,29 @@ def abc_user_assurance_payment(abc_user, user_alice, abc_payments_type):
 
 
 @pytest.fixture
+def abc_user_assurance_cost(abc_user, user_alice, abc_payments_type):
+    return MembershipPayment.objects.create(
+        amount=150,
+        user=abc_user,
+        author=user_alice,
+        association=abc_user.association,
+        payment_type=MembershipPayment.COST,
+        membership_payment_type=abc_payments_type[1]
+    )
+
+
+@pytest.fixture
+def abc_user_membership_payment(abc_user, user_alice, abc_payments_type):
+    return MembershipPayment.objects.create(
+        amount=80,
+        user=abc_user,
+        author=user_alice,
+        association=abc_user.association,
+        membership_payment_type=abc_payments_type[2]
+    )
+
+
+@pytest.fixture
 def xyz_user_membership_payment(xyz_user, inactive_xyz_user, xyz_payments_type):
     return MembershipPayment.objects.create(
         amount=15.5,

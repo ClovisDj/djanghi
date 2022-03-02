@@ -1,7 +1,6 @@
 from django.urls import reverse
 from rest_framework import status
 
-from apps.payments.models import MembershipPaymentSatus
 from apps.profiles import roles
 from tests import ActMixin
 
@@ -12,17 +11,14 @@ class TestMembershipPaymentsViewSet(ActMixin):
     def get_list_url(user):
         return reverse('membership-payments-list', kwargs={'user_pk': str(user.id)})
 
-    @staticmethod
-    def detail_url(uu_id):
-        return reverse('users-detail', args=(str(uu_id), ))
-
     def test_an_unauthenticated_user_cannot_list_any_membership_payment(self, base_client, abc_user, user_alice):
         self.act(self.get_list_url(abc_user), base_client, method='get', status_code=status.HTTP_401_UNAUTHORIZED)
 
     def test_authenticated_regular_user_cannot_add_a_membership_payment(self, authenticated_abc_user_client, abc_user):
         self.act(
             self.get_list_url(abc_user),
-            authenticated_abc_user_client, data={'amount': 10.5},
+            authenticated_abc_user_client,
+            data={'amount': 10.5},
             method='post',
             status_code=status.HTTP_403_FORBIDDEN
         )
@@ -140,7 +136,7 @@ class TestMembershipPaymentsViewSet(ActMixin):
             f'{self.get_list_url(user_alice)}/{str(abc_user_assurance_payment.id)}',
             authenticated_abc_user_client,
             method='get',
-            status_code=status.HTTP_404_NOT_FOUND
+            status_code=status.HTTP_403_FORBIDDEN
         )
 
     def test_authenticated_user_can_list_only_his_membership_payments(self, authenticated_abc_user_client, abc_user,
