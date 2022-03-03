@@ -1,0 +1,120 @@
+from django.urls import reverse
+from rest_framework import status
+
+from apps.profiles import roles
+from tests import ActMixin
+
+
+class TestAssociationContributionField(ActMixin):
+    list_url = reverse('associations_urls:contribution-fields-list')
+
+    @staticmethod
+    def detail_url(uu_id):
+        return reverse('associations_urls:contribution-fields-list', args=(str(uu_id), ))
+
+    @property
+    def create_data(self):
+        return {
+            'name': 'Recouvrement',
+        }
+
+    def test_an_unauthenticated_user_cannot_list_contribution_fields(self, base_client):
+        self.act(self.list_url, base_client, method='get',
+                 status_code=status.HTTP_401_UNAUTHORIZED)
+
+    def test_an_authenticated_regular_user_cannot_list_contribution_fields(self, authenticated_abc_user_client,
+                                                                           abc_payments_type):
+        self.act(self.list_url, authenticated_abc_user_client, method='get', status_code=status.HTTP_403_FORBIDDEN)
+
+    def test_a_payment_manager_cannot_list_contribution_fields(self, authenticated_abc_user_client, abc_user,
+                                                               abc_payments_type):
+        abc_user.add_roles(roles.PAYMENT_MANAGER)
+        self.act(self.list_url, authenticated_abc_user_client, method='get', status_code=status.HTTP_403_FORBIDDEN)
+
+    def test_full_admin_can_list_his_association_contribution_fields(self, authenticated_alice_user_client,
+                                                                     alice_full_admin, abc_payments_type,
+                                                                     xyz_payments_type):
+        response_data = self.act(
+            self.list_url,
+            authenticated_alice_user_client,
+            method='get',
+            status_code=status.HTTP_200_OK
+        ).json()
+
+        response_ids_set = {item['id'] for item in response_data['data']}
+        assert response_ids_set == {str(obj.id) for obj in abc_payments_type}
+
+    def test_full_admin_can_add_an_association_contribution_fields(self, authenticated_alice_user_client,
+                                                                   alice_full_admin):
+        self.act(
+            self.list_url,
+            authenticated_alice_user_client,
+            data=self.create_data,
+            method='post',
+            status_code=status.HTTP_201_CREATED
+        )
+
+    def test_contribution_field_name_should_be_unique_for_an_association(self, authenticated_alice_user_client,
+                                                                         abc_payments_type, alice_full_admin):
+        error_data = self.act(
+            self.list_url,
+            authenticated_alice_user_client,
+            data={'name': 'Inscription'},
+            method='post',
+            status_code=status.HTTP_400_BAD_REQUEST
+        ).json()['errors'][0]
+
+        assert error_data['detail'] == 'A contribution field with name: Inscription, already exists'
+
+    def test_contribution_field_name_should_be_unique_for_an_in_update_action_association(
+            self, authenticated_alice_user_client, abc_payments_type, alice_full_admin):
+
+        error_data = self.act(
+            f'{self.list_url}/{str(abc_payments_type[1].id)}',
+            authenticated_alice_user_client,
+            data={'name': 'Inscription'},
+            method='patch',
+            status_code=status.HTTP_400_BAD_REQUEST
+        ).json()['errors'][0]
+
+        assert error_data['detail'] == 'A contribution field with name: Inscription, already exists'
+
+    def test_full_admin_can_update_his_association_contribution_field(self, authenticated_alice_user_client,
+                                                                      abc_payments_type, alice_full_admin):
+
+        response_data = self.act(
+            f'{self.list_url}/{str(abc_payments_type[1].id)}',
+            authenticated_alice_user_client,
+            data={
+                'is_required': False,
+                'required_amount': 145.5,
+                'member_can_opt_in': True,
+            },
+            method='patch',
+            status_code=status.HTTP_200_OK
+        ).json()['data']['attributes']
+
+        assert not response_data['is_required']
+        assert response_data['member_can_opt_in']
+        assert response_data['required_amount'] == 145.5
+
+    def test_full_admin_cannot_delete_a_contribution_field_in_use(self, authenticated_alice_user_client,
+                                                                  abc_payments_type, abc_user_assurance_payment,
+                                                                  alice_full_admin):
+        error_data = self.act(
+            f'{self.list_url}/{str(abc_payments_type[1].id)}',
+            authenticated_alice_user_client,
+            method='delete',
+            status_code=status.HTTP_400_BAD_REQUEST
+        ).json()['errors'][0]
+
+        assert error_data['detail'] == 'This contribution field is already in use and cannot be deleted'
+
+    def test_full_admin_can_delete_a_non_in_use_contribution_field(self, authenticated_alice_user_client,
+                                                                   abc_payments_type, alice_full_admin):
+        self.act(
+            f'{self.list_url}/{str(abc_payments_type[1].id)}',
+            authenticated_alice_user_client,
+            method='delete',
+            status_code=status.HTTP_204_NO_CONTENT
+        )

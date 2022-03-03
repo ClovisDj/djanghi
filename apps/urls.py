@@ -32,7 +32,10 @@ users_nested_router.register(r'payments_status', MembershipPaymentStatusModelVie
 urlpatterns = [
     path('staff/', admin.site.urls),
     path('', include('apps.profiles.urls', namespace='profiles_urls')),
+    path('', include('apps.associations.urls', namespace='associations_urls')),
 ]
 
 urlpatterns += router.urls
 urlpatterns += users_nested_router.urls
+
+print(urlpatterns)
