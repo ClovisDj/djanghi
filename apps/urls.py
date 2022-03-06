@@ -37,5 +37,3 @@ urlpatterns = [
 
 urlpatterns += router.urls
 urlpatterns += users_nested_router.urls
-
-print(urlpatterns)
