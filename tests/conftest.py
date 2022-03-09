@@ -2,7 +2,8 @@ import pytest
 from rest_framework.test import APIClient
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from apps.associations.models import Association
+from apps.associations.models import Association, MemberContributionField
+from apps.payments.models import MembershipPayment
 from apps.profiles.models import User
 from apps.profiles.roles import FULL_ADMIN
 
@@ -136,3 +137,37 @@ def alice_full_admin(user_alice):
     user_alice.add_roles(*[FULL_ADMIN])
     return user_alice
 
+
+@pytest.fixture
+def abc_payments_type(association_abc):
+    payment_names = ('Inscription', 'Assurance', 'Membership')
+    return [
+        MemberContributionField.objects.create(
+            name=name,
+            association=association_abc
+        )
+        for name in payment_names
+    ]
+
+
+@pytest.fixture
+def xyz_payments_type(association_xyz):
+    payment_names = ('Inscription', 'Assurance', 'Membership')
+    return [
+        MemberContributionField.objects.create(
+            name=name,
+            association=association_xyz
+        )
+        for name in payment_names
+    ]
+
+
+@pytest.fixture
+def abc_user_assurance_payment(abc_user, user_alice, abc_payments_type):
+    return MembershipPayment.objects.create(
+        amount=200,
+        user=abc_user,
+        author=user_alice,
+        association=abc_user.association,
+        membership_payment_type=abc_payments_type[1]
+    )

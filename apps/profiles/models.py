@@ -1,6 +1,7 @@
 import uuid
 
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db.models import Count
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -51,7 +52,12 @@ class CustomPermission(Permission):
 
 class CustomUserManager(UserManager):
     def get_actives(self):
-        return self.filter(is_active=True, association_id__isnull=False)
+        return self.filter(
+            is_active=True,
+            is_registered=True,
+            association__is_active=True,
+            association_id__isnull=False,
+        )
 
     def for_association(self, association):
         return self.filter(association=association)
@@ -61,6 +67,15 @@ class CustomUserManager(UserManager):
 
 
 class User(AbstractUser):
+    MALE = 'M'
+    FEMALE = 'F'
+    UNSPECIFIED = 'U'
+    SEX_CHOICES = (
+        (MALE, 'Male'),
+        (FEMALE, 'Female'),
+        (FEMALE, 'Female'),
+        (UNSPECIFIED, 'Unspecified'),
+    )
     # Had to paste these here due to circular import
     id = models.UUIDField(db_index=True, primary_key=True, default=uuid.uuid4, editable=False)
     updated_at = models.DateTimeField(auto_now=True)
@@ -74,6 +89,7 @@ class User(AbstractUser):
     date_of_birth = models.DateField(null=True, blank=True)
     city_of_birth = models.CharField(max_length=100, null=True, blank=True)
     country_of_birth = models.CharField(max_length=100, null=True, blank=True)
+    sex = models.CharField(max_length=2, choices=SEX_CHOICES, default=UNSPECIFIED)
     address = models.CharField(max_length=300, null=True, blank=True)
 
     groups = models.ManyToManyField(
@@ -113,9 +129,27 @@ class User(AbstractUser):
             models.UniqueConstraint(fields=['email', 'association'], name='unique_username_by_association')
         ]
 
+    def validate_sex_choice(self):
+        sex_choice_is_valid = False
+        for sex_option, _ in self.SEX_CHOICES:
+            if self.sex == sex_option:
+                sex_choice_is_valid = True
+                break
+
+        if not sex_choice_is_valid:
+            raise ValidationError(
+                {'sex': f'{self.sex} is not a valid choice'}
+            )
+
+    def clean(self):
+        super().clean()
+
+        self.validate_sex_choice()
+
     def save(self, *args, **kwargs):
         self.username = self.email
 
+        self.clean()
         return super().save(*args, **kwargs)
 
     @staticmethod
@@ -165,6 +199,11 @@ class User(AbstractUser):
         roles_set_by_value = {role.value for role in roles_obj}
         user_roles_set = self.user_roles_set_by('value')
         return bool(roles_set_by_value.issubset(user_roles_set))
+
+    def has_min_one_role(self, *roles):
+        roles_object_set = self.get_roles(*roles)
+        user_roles_set = set(self.roles.all())
+        return bool(roles_object_set.intersection(user_roles_set))
 
     @property
     def is_full_admin(self):

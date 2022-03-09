@@ -38,6 +38,7 @@ down:
 	docker-compose down
 
 n := -n2
+# Ex: make pytest n=-n6
 pytest:
 	$(user-shell) bash -c "pytest $(n) --cov=apps --cov-report=term"
 

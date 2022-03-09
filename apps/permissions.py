@@ -16,6 +16,43 @@ class IsUserOrFullAdmin(BasePermission):
         return False
 
 
-class IsAdmin(BasePermission):
+class AdminAccessPolicyPermission(BasePermission):
     def has_permission(self, request, view):
-        return request.user.is_admin
+        from apps.profiles.models import User
+
+        allowed_roles = getattr(view, 'allowed_admin_roles', [])
+        if allowed_roles and request.user.is_admin:
+            return isinstance(request.user, User) and request.user.has_min_one_role(*allowed_roles)
+
+        return True
+
+
+class RegularUserActionPermissions(BasePermission):
+    def has_permission(self, request, view):
+        from apps.profiles.models import User
+
+        allowed_actions = getattr(view, 'regular_user_allowed_actions', [])
+
+        if isinstance(request.user, User) and not request.user.is_admin:
+            if not allowed_actions:
+                return False
+
+            if allowed_actions:
+                return request.method.upper() in list(map(str.upper, allowed_actions))
+
+        return True
+
+
+class RegularUserNestedRoutePermission(BasePermission):
+
+    @staticmethod
+    def is_user_nested_route(request):
+        return 'user_pk' in request.parser_context['kwargs']
+
+    def has_permission(self, request, view):
+        from apps.profiles.models import User
+
+        if isinstance(request.user, User) and not request.user.is_admin and self.is_user_nested_route(request):
+            return request.parser_context['kwargs']['user_pk'] == str(request.user.id)
+
+        return True

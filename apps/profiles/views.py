@@ -2,9 +2,7 @@ import json
 
 from django.conf import settings
 from django.http import HttpResponseNotFound, HttpResponseRedirect
-from django.http.response import HttpResponsePermanentRedirect
 from django.shortcuts import render
-from django.urls import reverse
 from django.utils import timezone
 from django.views import View
 
@@ -13,8 +11,8 @@ from rest_framework.viewsets import GenericViewSet
 from rest_framework_simplejwt.views import TokenObtainPairView
 
 from apps.associations.models import Association
-from apps.permissions import IsUserOrFullAdmin, IsAdmin
-from apps.profiles import serializers
+from apps.permissions import IsUserOrFullAdmin
+from apps.profiles import serializers, roles
 from apps.profiles.models import User, UserRegistrationLink
 from apps.profiles.serializers import UserModelSerializer, UserAdminModelSerializer, UserRegistrationModelSerializer, \
     UserRegistrationForm
@@ -57,7 +55,8 @@ class UserRegistrationViewSet(mixins.CreateModelMixin,
 
     queryset = UserRegistrationLink.objects.all()
     serializer_class = UserRegistrationModelSerializer
-    permission_classes = (permissions.IsAuthenticated, IsAdmin, )
+
+    allowed_admin_roles = (roles.FULL_ADMIN, roles.PAYMENT_MANAGER, roles.COST_MANAGER, )
 
 
 class UserRegistrationView(View):
@@ -107,7 +106,6 @@ class UserRegistrationView(View):
             return HttpResponseNotFound()
 
         context = {**self.get_context(), 'form': self.form_class()}
-        # context.update()
         return render(request, self.template_name, context=context)
 
     def post(self, request, *args, **kwargs):

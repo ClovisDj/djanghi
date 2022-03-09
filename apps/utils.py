@@ -1,7 +1,6 @@
 import uuid
 
 from django.db import models
-from rest_framework.exceptions import PermissionDenied
 from rest_framework_simplejwt.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.tokens import RefreshToken
 
