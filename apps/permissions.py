@@ -1,5 +1,13 @@
 from rest_framework.permissions import BasePermission
 
+from apps.utils import is_valid_uuid
+
+
+class IsNesterUserRouteMixin:
+    @staticmethod
+    def is_user_nested_route(request):
+        return 'user_pk' in request.parser_context['kwargs']
+
 
 class IsUserOrFullAdmin(BasePermission):
     def has_object_permission(self, request, view, obj):
@@ -43,11 +51,19 @@ class RegularUserActionPermissions(BasePermission):
         return True
 
 
-class RegularUserNestedRoutePermission(BasePermission):
+class NestedUserRoutePermission(IsNesterUserRouteMixin, BasePermission):
 
-    @staticmethod
-    def is_user_nested_route(request):
-        return 'user_pk' in request.parser_context['kwargs']
+    def has_permission(self, request, view):
+        from apps.profiles.models import User
+
+        user_pk = request.parser_context.get('kwargs', {}).get('user_pk')
+        if isinstance(request.user, User) and self.is_user_nested_route(request) and is_valid_uuid(user_pk):
+            return request.user.association.users.filter(id=user_pk).exists()
+
+        return True
+
+
+class RegularUserNestedRoutePermission(IsNesterUserRouteMixin, BasePermission):
 
     def has_permission(self, request, view):
         from apps.profiles.models import User

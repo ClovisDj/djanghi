@@ -25,6 +25,7 @@ REST_FRAMEWORK = {
         'apps.permissions.AdminAccessPolicyPermission',
         'apps.permissions.RegularUserActionPermissions',
         'apps.permissions.RegularUserNestedRoutePermission',
+        'apps.permissions.NestedUserRoutePermission',
     ),
     'DEFAULT_METADATA_CLASS': 'rest_framework_json_api.metadata.JSONAPIMetadata',
     'TEST_REQUEST_RENDERER_CLASSES': (

@@ -45,6 +45,17 @@ class TestMembershipPaymentsStatusViewSet(ActMixin):
             status_code=status.HTTP_405_METHOD_NOT_ALLOWED
         )
 
+    def test_an_admin_cannot_another_association_user_payments_status(self, authenticated_alice_user_client,
+                                                                      alice_full_admin, xyz_user,
+                                                                      xyz_user_membership_payment,
+                                                                      abc_user_assurance_payment):
+        self.act(
+            self.get_list_url(xyz_user),
+            authenticated_alice_user_client,
+            method='get',
+            status_code=status.HTTP_403_FORBIDDEN
+        )
+
     def test_authenticated_full_admin_can_read_a_user_payments_status(self, authenticated_alice_user_client, abc_user,
                                                                       alice_full_admin, abc_user_inscription_payment,
                                                                       abc_user_assurance_payment,
