@@ -37,7 +37,6 @@ class MemberContributionFieldModelSerializer(serializers.ModelSerializer):
 
 
 class AssociationModelSerializer(serializers.ModelSerializer):
-    member_contribution_fields = MemberContributionFieldModelSerializer(many=True)
 
     class Meta:
         model = Association
