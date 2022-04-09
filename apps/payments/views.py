@@ -27,7 +27,7 @@ class MembershipPaymentStatusModelViewSet(mixins.ListModelMixin,
                                           mixins.RetrieveModelMixin,
                                           GenericViewSet):
 
-    queryset = MembershipPaymentSatus.objects.all().order_by('-membership_payment_type__created_at')
+    queryset = MembershipPaymentSatus.objects.all().order_by('membership_payment_type__name')
     serializer_class = MembershipPaymentSatusModelSerializer
     allowed_admin_roles = (roles.FULL_ADMIN, roles.PAYMENT_MANAGER, roles.COST_MANAGER, )
     regular_user_allowed_actions = ('get', )

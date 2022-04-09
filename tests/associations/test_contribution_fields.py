@@ -22,9 +22,22 @@ class TestAssociationContributionField(ActMixin):
         self.act(self.list_url, base_client, method='get',
                  status_code=status.HTTP_401_UNAUTHORIZED)
 
-    def test_an_authenticated_regular_user_cannot_list_contribution_fields(self, authenticated_abc_user_client,
-                                                                           abc_payments_type):
-        self.act(self.list_url, authenticated_abc_user_client, method='get', status_code=status.HTTP_403_FORBIDDEN)
+    def test_an_authenticated_regular_user_can_list_his_association_contribution_fields(self,
+                                                                                        authenticated_abc_user_client,
+                                                                                        abc_payments_type,
+                                                                                        xyz_payments_type):
+        abc_contrib_field_ids = [str(contrib.id) for contrib in abc_payments_type]
+
+        response_data = self.act(
+            self.list_url,
+            authenticated_abc_user_client,
+            method='get',
+            status_code=status.HTTP_200_OK
+        ).json()
+
+        assert len(abc_payments_type) == len(response_data['data'])
+        for contrib_field in response_data['data']:
+            assert contrib_field['id'] in abc_contrib_field_ids
 
     def test_a_payment_manager_cannot_list_contribution_fields(self, authenticated_abc_user_client, abc_user,
                                                                abc_payments_type):

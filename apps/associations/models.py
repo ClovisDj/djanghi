@@ -46,6 +46,7 @@ class MemberContributionField(CreateUpdateDateMixin, UUIDModelMixin, models.Mode
     )
 
     class Meta:
+        ordering = ['name']
         constraints = [
             models.UniqueConstraint(
                 fields=['name', 'association'],

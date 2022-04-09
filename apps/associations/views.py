@@ -16,6 +16,7 @@ class MembershipContributionFieldsModelViewSet(mixins.CreateModelMixin,
     queryset = MemberContributionField.objects.all()
     serializer_class = MemberContributionFieldModelSerializer
     allowed_admin_roles = (roles.FULL_ADMIN, )
+    regular_user_allowed_actions = ('get', )
 
     def perform_destroy(self, instance):
         if instance.membership_payments.exists():
