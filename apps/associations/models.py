@@ -33,17 +33,35 @@ class Association(CreateUpdateDateMixin, UUIDModelMixin, models.Model):
         return '[%s] %s object (%s)' % (self.label, self.__class__.__name__, self.pk)
 
 
+class ContribFieldManager(models.Manager):
+    def active(self):
+        return self.filter(archived=False)
+
+    def archived(self):
+        return self.filter(archived=True)
+
+
 class MemberContributionField(CreateUpdateDateMixin, UUIDModelMixin, models.Model):
     name = models.CharField(max_length=30, null=False)
     is_required = models.BooleanField(default=True)
     required_amount = models.FloatField(null=True, blank=True)
     member_can_opt_in = models.BooleanField(default=False)
+    archived = models.BooleanField(default=False, db_index=True)
 
     association = models.ForeignKey(
         Association,
         on_delete=models.CASCADE,
         related_name='member_contribution_fields'
     )
+    archived_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='archived_contribution_fields',
+        null=True,
+        blank=True
+    )
+
+    objects = ContribFieldManager()
 
     class Meta:
         ordering = ['name']

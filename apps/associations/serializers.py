@@ -10,6 +10,8 @@ class MemberContributionFieldModelSerializer(serializers.ModelSerializer):
         read_only_fields = (
             'created_at',
             'updated_at',
+            'archived',
+            'archived_by',
         )
         exclude = (
             'association',
