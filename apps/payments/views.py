@@ -1,3 +1,4 @@
+from django.db import transaction
 from rest_framework import mixins
 from rest_framework.viewsets import GenericViewSet
 
@@ -17,6 +18,10 @@ class MembershipPaymentModelViewSet(mixins.CreateModelMixin,
     filterset_class = MembershipPaymentFilter
     allowed_admin_roles = (roles.FULL_ADMIN, roles.PAYMENT_MANAGER, roles.COST_MANAGER, )
     regular_user_allowed_actions = ('get', )
+
+    @transaction.atomic
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
 
     def get_queryset(self):
         queryset = super().get_queryset()

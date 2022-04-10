@@ -101,7 +101,7 @@ class TestUserModelViewSet(ActMixin):
             status_code=status.HTTP_403_FORBIDDEN
         )
 
-    def test_regular_user_should_not_have_access_admin_info_details(self, authenticated_abc_user_client, abc_user):
+    def test_regular_user_should_not_have_access_to_admin_info_details(self, authenticated_abc_user_client, abc_user):
         attributes = self.act(self.detail_url(abc_user.id), authenticated_abc_user_client, method='get',
                               status_code=status.HTTP_200_OK).json()['data']['attributes']
 
@@ -111,8 +111,8 @@ class TestUserModelViewSet(ActMixin):
         assert 'is_cost_manager' not in attributes
         assert 'is_cotisation_manager' not in attributes
 
-    def test_admin_should_have_access_admin_info_details(self, authenticated_alice_user_client, abc_user,
-                                                         alice_full_admin):
+    def test_admin_should_have_access_to_admin_info_details(self, authenticated_alice_user_client, abc_user,
+                                                            alice_full_admin):
         attributes = self.act(self.detail_url(abc_user.id), authenticated_alice_user_client, method='get',
                               status_code=status.HTTP_200_OK).json()['data']['attributes']
 
