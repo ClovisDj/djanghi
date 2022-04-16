@@ -1,10 +1,12 @@
 from django.db import transaction
-from rest_framework import mixins
+from rest_framework import mixins, status
+from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from apps.payments.filters import MembershipPaymentFilter
 from apps.payments.models import MembershipPayment, MembershipPaymentSatus
-from apps.payments.serializers import MembershipPaymentModelSerializer, MembershipPaymentSatusModelSerializer
+from apps.payments.serializers import MembershipPaymentModelSerializer, MembershipPaymentSatusModelSerializer, \
+    BulkMembershipPaymentModelSerializer
 from apps.profiles import roles
 
 
@@ -40,3 +42,19 @@ class MembershipPaymentStatusModelViewSet(mixins.ListModelMixin,
     def get_queryset(self):
         queryset = super().get_queryset()
         return queryset.filter(user_id=self.request.parser_context['kwargs']['user_pk'])
+
+
+class BulkMembershipPaymentModelViewSet(mixins.CreateModelMixin,
+                                        GenericViewSet):
+
+    queryset = MembershipPayment.objects.all()
+    serializer_class = BulkMembershipPaymentModelSerializer
+    allowed_admin_roles = (roles.FULL_ADMIN, roles.PAYMENT_MANAGER, roles.COST_MANAGER, )
+
+    @transaction.atomic
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(status=status.HTTP_201_CREATED, headers=headers)
