@@ -5,7 +5,7 @@ from rest_framework_json_api import serializers
 from apps.associations.serializers import MemberContributionFieldModelSerializer
 from apps.payments.models import MembershipPayment, MembershipPaymentSatus
 from apps.profiles.models import User
-from apps.profiles.serializers import UserModelSerializer
+from apps.profiles.serializers import UserModelSerializer, BaseUserModelSerializer
 
 
 class BaseMembershipPaymentModelSerializer(serializers.ModelSerializer):
@@ -114,8 +114,9 @@ class MembershipPaymentSatusModelSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     class JSONAPIMeta:
-        included_resources = ('membership_payment_type', )
+        included_resources = ('membership_payment_type', 'user')
 
     included_serializers = {
-        'membership_payment_type': MemberContributionFieldModelSerializer
+        'membership_payment_type': MemberContributionFieldModelSerializer,
+        'user': BaseUserModelSerializer,
     }

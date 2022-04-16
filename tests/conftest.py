@@ -1,3 +1,5 @@
+import copy
+
 import pytest
 from rest_framework.test import APIClient
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -74,35 +76,42 @@ def abc_user(user_create_data, association_abc):
 
 @pytest.fixture
 def third_abc_user(user_create_data, association_abc):
-    user_create_data['email'] = 'abc.user.3@abc.com'
-    user_create_data['association_id'] = association_abc.id
+    data = copy.deepcopy(user_create_data)
+    data['email'] = 'abc.user.3@abc.com'
+    data['first_name'] = 'Richard'
+    data['last_name'] = 'Kenfack'
+    data['association_id'] = association_abc.id
     return User.objects.create_user(
         'abc.user.3@abc.com',
-        **user_create_data
+        **data
     )
 
 
 @pytest.fixture
 def user_alice(user_create_data, association_abc):
-    user_create_data['email'] = 'alice@abc.com'
-    user_create_data['first_name'] = 'alice'
-    user_create_data['last_name'] = 'Johnson'
-    user_create_data['association_id'] = association_abc.id
+    data = copy.deepcopy(user_create_data)
+    data['email'] = 'alice@abc.com'
+    data['first_name'] = 'alice'
+    data['last_name'] = 'Johnson'
+    data['association_id'] = association_abc.id
     return User.objects.create_user(
         'alice@abc.com',
-        **user_create_data
+        **data
     )
 
 
 @pytest.fixture
 def inactive_abc_user(user_create_data, association_abc):
-    user_create_data['email'] = 'abc.user.2@abc.com'
-    user_create_data['association_id'] = association_abc.id
-    user_create_data['is_active'] = False
-    user_create_data['is_registered'] = False
+    data = copy.deepcopy(user_create_data)
+    data['email'] = 'abc.user.2@abc.com'
+    data['first_name'] = 'Ian'
+    data['last_name'] = 'Clay'
+    data['association_id'] = association_abc.id
+    data['is_active'] = False
+    data['is_registered'] = False
     return User.objects.create_user(
         'abc.user.1@abc.com',
-        **user_create_data
+        **data
     )
 
 
