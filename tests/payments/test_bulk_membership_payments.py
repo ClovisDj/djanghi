@@ -2,6 +2,7 @@ from django.urls import reverse
 from rest_framework import status
 
 from apps.profiles import roles
+from apps.profiles.models import User
 from apps.payments.models import MembershipPayment
 from tests import ActMixin
 
@@ -28,6 +29,23 @@ class TestBulkMembershipPaymentsViewSet(ActMixin):
             method='post',
             status_code=status.HTTP_403_FORBIDDEN
         )
+
+    def test_by_default_bulk_membership_payments_required_user_ids(self, authenticated_alice_user_client,
+                                                                   alice_full_admin, abc_bulk_payments_data):
+        abc_bulk_payments_data['user_ids'] = []
+        abc_bulk_payments_data['for_all_users'] = False
+
+        response = self.act(
+            self.list_url,
+            authenticated_alice_user_client,
+            data=abc_bulk_payments_data,
+            method='post',
+            status_code=status.HTTP_400_BAD_REQUEST
+        ).json()
+
+        errors = response['errors']
+        assert errors[0]['detail'] == 'Should Provide at least one valid user'
+        assert errors[0]['source']['pointer'].split('/')[-1] == 'user_ids'
 
     def test_authenticated_full_admin_can_bulk_add_membership_payments(self, authenticated_alice_user_client,
                                                                        alice_full_admin, abc_bulk_payments_data):
@@ -82,3 +100,23 @@ class TestBulkMembershipPaymentsViewSet(ActMixin):
             method='post',
             status_code=status.HTTP_201_CREATED
         )
+
+    def test_authenticated_full_admin_can_bulk_add_membership_payment_to_all_of_his_association_users(
+            self, authenticated_alice_user_client, alice_full_admin, abc_bulk_payments_data):
+
+        abc_bulk_payments_data['user_ids'] = []
+        abc_bulk_payments_data['for_all_users'] = True
+        abc_active_users_count = User.objects.filter(association=alice_full_admin.association, is_active=True).count()
+
+        self.act(
+            self.list_url,
+            authenticated_alice_user_client,
+            data=abc_bulk_payments_data,
+            method='post',
+            status_code=status.HTTP_201_CREATED
+        )
+
+        assert MembershipPayment.objects.filter(
+            association=alice_full_admin.association,
+            note=abc_bulk_payments_data['note']
+        ).count() == abc_active_users_count

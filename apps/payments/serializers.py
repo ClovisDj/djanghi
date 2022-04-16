@@ -78,7 +78,7 @@ class BulkMembershipPaymentModelSerializer(BaseMembershipPaymentModelSerializer)
         return valid_user_ids
 
     def validate(self, attrs):
-        for_all_user = attrs.get('for_all_user')
+        for_all_user = attrs.get('for_all_users')
         user_ids = attrs.get('user_ids', [])
 
         if not len(user_ids) > 0 and not for_all_user:
