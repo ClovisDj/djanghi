@@ -61,7 +61,31 @@ class LoginSerializer(TokenObtainSerializer):
         return data
 
 
-class UserModelSerializer(serializers.ModelSerializer):
+class BaseUserModelSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        read_only_fields = (
+            'created_at',
+            'updated_at',
+            'date_joined',
+            'last_login',
+            'is_registered',
+            'email',
+            'is_active',
+        )
+        exclude = (
+            'password',
+            'username',
+            'groups',
+            'user_permissions',
+            'is_superuser',
+            'is_staff',
+            'roles',
+        )
+
+
+class UserModelSerializer(BaseUserModelSerializer):
 
     class Meta:
         model = User

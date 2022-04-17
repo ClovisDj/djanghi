@@ -25,6 +25,7 @@ REST_FRAMEWORK = {
         'apps.permissions.AdminAccessPolicyPermission',
         'apps.permissions.RegularUserActionPermissions',
         'apps.permissions.RegularUserNestedRoutePermission',
+        'apps.permissions.NestedUserRoutePermission',
     ),
     'DEFAULT_METADATA_CLASS': 'rest_framework_json_api.metadata.JSONAPIMetadata',
     'TEST_REQUEST_RENDERER_CLASSES': (
@@ -33,11 +34,13 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_FILTER_BACKENDS': (
         'apps.extensions.backend.AssociationFilterBackend',
+        'django_filters.rest_framework.DjangoFilterBackend',
+        'rest_framework.filters.SearchFilter',
         'rest_framework_json_api.filters.OrderingFilter',
         'rest_framework_json_api.django_filters.DjangoFilterBackend',
-        'rest_framework.filters.SearchFilter',
+
     ),
-    'SEARCH_PARAM': 'filter[search]',
+    'SEARCH_PARAM': 'search',
 
     'TEST_REQUEST_DEFAULT_FORMAT': 'json',
     'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.URLPathVersioning',

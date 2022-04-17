@@ -2,6 +2,7 @@ from django.urls import reverse
 from rest_framework import status
 
 from apps.profiles import roles
+from apps.profiles.roles import PAYMENT_MANAGER
 from tests import ActMixin
 
 
@@ -10,7 +11,7 @@ class TestAssociationContributionField(ActMixin):
 
     @staticmethod
     def detail_url(uu_id):
-        return reverse('associations_urls:contribution-fields-list', args=(str(uu_id), ))
+        return reverse('associations_urls:contribution-fields-detail', args=(str(uu_id), ))
 
     @property
     def create_data(self):
@@ -22,9 +23,22 @@ class TestAssociationContributionField(ActMixin):
         self.act(self.list_url, base_client, method='get',
                  status_code=status.HTTP_401_UNAUTHORIZED)
 
-    def test_an_authenticated_regular_user_cannot_list_contribution_fields(self, authenticated_abc_user_client,
-                                                                           abc_payments_type):
-        self.act(self.list_url, authenticated_abc_user_client, method='get', status_code=status.HTTP_403_FORBIDDEN)
+    def test_an_authenticated_regular_user_can_list_his_association_contribution_fields(self,
+                                                                                        authenticated_abc_user_client,
+                                                                                        abc_payments_type,
+                                                                                        xyz_payments_type):
+        abc_contrib_field_ids = [str(contrib.id) for contrib in abc_payments_type]
+
+        response_data = self.act(
+            self.list_url,
+            authenticated_abc_user_client,
+            method='get',
+            status_code=status.HTTP_200_OK
+        ).json()
+
+        assert len(abc_payments_type) == len(response_data['data'])
+        for contrib_field in response_data['data']:
+            assert contrib_field['id'] in abc_contrib_field_ids
 
     def test_a_payment_manager_cannot_list_contribution_fields(self, authenticated_abc_user_client, abc_user,
                                                                abc_payments_type):
@@ -118,3 +132,57 @@ class TestAssociationContributionField(ActMixin):
             method='delete',
             status_code=status.HTTP_204_NO_CONTENT
         )
+
+    def test_a_regular_user_cannot_archive_a_contrib_field(self, authenticated_abc_user_client, abc_payments_type):
+        self.act(
+            f'{self.detail_url(abc_payments_type[1].id)}/archive',
+            authenticated_abc_user_client,
+            method='post',
+            status_code=status.HTTP_403_FORBIDDEN
+        )
+
+    def test_a_non_full_admin_user_cannot_archive_a_contrib_field(self, authenticated_abc_user_client,
+                                                                  abc_payments_type,
+                                                                  user_alice):
+        user_alice.add_roles(PAYMENT_MANAGER)
+
+        assert user_alice.is_admin
+        assert not user_alice.is_full_admin
+
+        self.act(
+            f'{self.detail_url(abc_payments_type[1].id)}/archive',
+            authenticated_abc_user_client,
+            method='post',
+            status_code=status.HTTP_403_FORBIDDEN
+        )
+
+    def test_only_a_full_admin_user_can_archive_a_contrib_field(self, authenticated_alice_user_client,
+                                                                abc_payments_type, alice_full_admin):
+        assert alice_full_admin.is_full_admin
+
+        self.act(
+            f'{self.detail_url(abc_payments_type[1].id)}/archive',
+            authenticated_alice_user_client,
+            method='post',
+            status_code=status.HTTP_204_NO_CONTENT
+        )
+
+        abc_payments_type[1].refresh_from_db()
+        assert abc_payments_type[1].archived
+        assert abc_payments_type[1].archived_by_id == alice_full_admin.id
+
+    def test_a_regular_user_cannot_list_an_archived_contribution_field(self, authenticated_abc_user_client,
+                                                                       abc_payments_type):
+        abc_payments_type[0].archived = True
+        abc_payments_type[0].save()
+
+        response_data = self.act(
+            self.list_url,
+            authenticated_abc_user_client,
+            method='get',
+            status_code=status.HTTP_200_OK
+        ).json()
+
+        assert len(response_data['data']) == len(abc_payments_type) - 1
+        for contrib in response_data['data']:
+            assert contrib['id'] != str(abc_payments_type[0].id)

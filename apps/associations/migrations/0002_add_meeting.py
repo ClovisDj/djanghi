@@ -34,6 +34,17 @@ class Migration(migrations.Migration):
             name='required_amount',
             field=models.FloatField(blank=True, null=True),
         ),
+        migrations.AddField(
+            model_name='membercontributionfield',
+            name='archived',
+            field=models.BooleanField(db_index=True, default=False),
+        ),
+        migrations.AddField(
+            model_name='membercontributionfield',
+            name='archived_by',
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE,
+                                    related_name='archived_contribution_fields', to=settings.AUTH_USER_MODEL),
+        ),
         migrations.CreateModel(
             name='Meeting',
             fields=[

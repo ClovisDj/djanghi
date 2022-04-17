@@ -21,6 +21,9 @@ class CreateUpdateDateMixin(models.Model):
 
 
 def is_valid_uuid(uuid_str, version=4):
+    if not isinstance(uuid_str, (str, uuid.UUID)):
+        return False
+
     try:
         uuid_obj = uuid.UUID(uuid_str, version=version)
     except ValueError:

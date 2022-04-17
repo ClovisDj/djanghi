@@ -33,6 +33,7 @@ urlpatterns = [
     path('staff/', admin.site.urls),
     path('', include('apps.profiles.urls', namespace='profiles_urls')),
     path('', include('apps.associations.urls', namespace='associations_urls')),
+    path('', include('apps.payments.urls', namespace='payments_urls')),
 ]
 
 urlpatterns += router.urls

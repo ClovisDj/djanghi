@@ -43,6 +43,7 @@ class Migration(migrations.Migration):
                 ('is_required', models.BooleanField(default=True)),
                 ('association', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='member_contribution_fields', to='associations.association')),
             ],
+            options={'ordering': ['name']},
         ),
         migrations.AddConstraint(
             model_name='membercontributionfield',
