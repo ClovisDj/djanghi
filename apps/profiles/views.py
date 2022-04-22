@@ -32,6 +32,7 @@ class UserModelViewSet(mixins.RetrieveModelMixin,
 
     queryset = User.objects.get_actives()
     serializer_class = UserModelSerializer
+    search_fields = ('first_name', 'last_name', 'email', )
     permission_classes = (permissions.IsAuthenticated, IsUserOrFullAdmin, )
 
     def get_serializer_class(self):
