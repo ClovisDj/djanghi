@@ -14,15 +14,14 @@ class MembershipPaymentFilter(filters.FilterSet):
 
 class MembershipPaymentsStatusFilter(filters.FilterSet):
     contribution_id = filters.UUIDFilter(field_name="membership_payment_type_id")
-    user_id = filters.CharFilter(method='filter_by_ids')
+    user_ids = filters.CharFilter(method='filter_by_ids')
 
     class Meta:
         model = MembershipPaymentSatus
-        fields = ('membership_payment_type_id', )
+        fields = ('membership_payment_type_id', "user_id")
 
     @staticmethod
     def filter_by_ids(queryset, value, *args, **kwargs):
-        print(args)
         if args and len(args) > 0 and isinstance(args[0], str):
             ids = args[0].split(',')
             ids = [user_id for user_id in ids if is_valid_uuid(user_id)]
