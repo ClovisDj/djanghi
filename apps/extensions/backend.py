@@ -27,7 +27,7 @@ class DjanghiModelBackend(ModelBackend):
             user_kwargs['association__label__iexact'] = association_label
 
         try:
-            user = User.objects.get_actives().get(**user_kwargs)
+            user = User.objects.get_actives().filter(is_registered=True).get(**user_kwargs)
         except User.DoesNotExist:
             # Comment below is copied from Django
             # Run the default password hasher once to reduce the timing

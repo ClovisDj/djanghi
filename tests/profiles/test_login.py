@@ -50,6 +50,28 @@ class TestUserLoginView(ActMixin):
 
     def test_an_unregistered_user_cannot_login(self, inactive_abc_user, base_client):
         inactive_abc_user.set_password('password')
+        inactive_abc_user.is_active = True
+        inactive_abc_user.save()
+
+        self.act(
+            self.login_url,
+            base_client,
+            {
+                'email': inactive_abc_user.email,
+                'password': 'password',
+                'association': inactive_abc_user.association.label
+            },
+            status_code=status.HTTP_401_UNAUTHORIZED
+        )
+
+    def test_an_inactive_user_cannot_login(self, inactive_abc_user, base_client):
+        inactive_abc_user.set_password('password')
+        inactive_abc_user.is_registered = True
+        inactive_abc_user.save()
+        inactive_abc_user.refresh_from_db()
+
+        assert not inactive_abc_user.is_active
+
         self.act(
             self.login_url,
             base_client,
