@@ -30,7 +30,10 @@ class AdminAccessPolicyPermission(BasePermission):
 
         allowed_roles = getattr(view, 'allowed_admin_roles', [])
         if allowed_roles and request.user.is_admin:
-            return isinstance(request.user, User) and request.user.has_min_one_role(*allowed_roles)
+            return (
+                (isinstance(request.user, User) and request.user.has_min_one_role(*allowed_roles)) or
+                (request.method.lower() == 'get')
+            )
 
         return True
 

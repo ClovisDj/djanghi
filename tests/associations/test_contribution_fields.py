@@ -40,10 +40,10 @@ class TestAssociationContributionField(ActMixin):
         for contrib_field in response_data['data']:
             assert contrib_field['id'] in abc_contrib_field_ids
 
-    def test_a_payment_manager_cannot_list_contribution_fields(self, authenticated_abc_user_client, abc_user,
-                                                               abc_payments_type):
+    def test_a_payment_manager_should_have_read_access_to_contribution_fields(self, authenticated_abc_user_client,
+                                                                              abc_user, abc_payments_type):
         abc_user.add_roles(roles.PAYMENT_MANAGER)
-        self.act(self.list_url, authenticated_abc_user_client, method='get', status_code=status.HTTP_403_FORBIDDEN)
+        self.act(self.list_url, authenticated_abc_user_client, method='get', status_code=status.HTTP_200_OK)
 
     def test_full_admin_can_list_his_association_contribution_fields(self, authenticated_alice_user_client,
                                                                      alice_full_admin, abc_payments_type,
