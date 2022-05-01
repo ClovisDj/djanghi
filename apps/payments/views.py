@@ -2,6 +2,7 @@ from django.db import transaction
 from rest_framework import mixins, status
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
+from rest_framework_json_api.views import AutoPrefetchMixin
 
 from apps.payments.filters import MembershipPaymentFilter, MembershipPaymentsStatusFilter
 from apps.payments.models import MembershipPayment, MembershipPaymentSatus
@@ -22,12 +23,10 @@ SEARCH_FIELDS = (
 class MembershipPaymentModelViewSet(mixins.CreateModelMixin,
                                     mixins.RetrieveModelMixin,
                                     mixins.ListModelMixin,
+                                    AutoPrefetchMixin,
                                     GenericViewSet):
 
-    queryset = MembershipPayment.objects.prefetch_related(
-        'membership_payment_type',
-        'author'
-    )
+    queryset = MembershipPayment.objects.all()
     serializer_class = MembershipPaymentModelSerializer
     filterset_class = MembershipPaymentFilter
     allowed_admin_roles = (roles.FULL_ADMIN, roles.PAYMENT_MANAGER, roles.COST_MANAGER, )
@@ -49,12 +48,10 @@ class MembershipPaymentModelViewSet(mixins.CreateModelMixin,
 
 class AdminMembershipPaymentStatusModelViewSet(mixins.ListModelMixin,
                                                mixins.RetrieveModelMixin,
+                                               AutoPrefetchMixin,
                                                GenericViewSet):
 
-    queryset = MembershipPaymentSatus.objects.prefetch_related(
-        'membership_payment_type',
-        'user'
-    ).order_by('membership_payment_type__name')
+    queryset = MembershipPaymentSatus.objects.all().order_by('membership_payment_type__name')
     serializer_class = MembershipPaymentSatusModelSerializer
     filterset_class = MembershipPaymentsStatusFilter
     search_fields = SEARCH_FIELDS

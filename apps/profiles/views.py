@@ -8,6 +8,7 @@ from django.views import View
 
 from rest_framework import mixins, permissions
 from rest_framework.viewsets import GenericViewSet
+from rest_framework_json_api.views import AutoPrefetchMixin
 from rest_framework_simplejwt.views import TokenObtainPairView
 
 from apps.associations.models import Association
@@ -28,6 +29,7 @@ class UserModelViewSet(mixins.RetrieveModelMixin,
                        mixins.UpdateModelMixin,
                        mixins.DestroyModelMixin,
                        mixins.ListModelMixin,
+                       AutoPrefetchMixin,
                        GenericViewSet):
 
     queryset = User.objects.get_actives()
@@ -52,6 +54,7 @@ class UserRegistrationViewSet(mixins.CreateModelMixin,
                               mixins.RetrieveModelMixin,
                               mixins.UpdateModelMixin,
                               mixins.ListModelMixin,
+                              AutoPrefetchMixin,
                               GenericViewSet):
 
     queryset = UserRegistrationLink.objects.all()
