@@ -24,6 +24,16 @@ class IsUserOrAdmin(BasePermission):
         return False
 
 
+class IsFullAdmin(BasePermission):
+    def has_object_permission(self, request, view, obj):
+        from apps.profiles.models import User
+
+        if isinstance(request.user, User):
+            return request.user.is_full_admin
+
+        return False
+
+
 class AdminAccessPolicyPermission(BasePermission):
     def has_permission(self, request, view):
         from apps.profiles.models import User
