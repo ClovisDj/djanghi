@@ -9,7 +9,7 @@ class IsNesterUserRouteMixin:
         return 'user_pk' in request.parser_context['kwargs']
 
 
-class IsUserOrFullAdmin(BasePermission):
+class IsUserOrAdmin(BasePermission):
     def has_object_permission(self, request, view, obj):
         from apps.profiles.models import User
 
@@ -18,7 +18,7 @@ class IsUserOrFullAdmin(BasePermission):
                 request.method.lower() != 'delete':
             return True
 
-        if request.user.is_full_admin:
+        if request.user.is_admin:
             return True
 
         return False

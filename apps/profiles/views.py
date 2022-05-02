@@ -12,7 +12,7 @@ from rest_framework_json_api.views import AutoPrefetchMixin
 from rest_framework_simplejwt.views import TokenObtainPairView
 
 from apps.associations.models import Association
-from apps.permissions import IsUserOrFullAdmin
+from apps.permissions import IsUserOrAdmin
 from apps.profiles import serializers, roles
 from apps.profiles.models import User, UserRegistrationLink
 from apps.profiles.serializers import UserModelSerializer, UserAdminModelSerializer, UserRegistrationModelSerializer, \
@@ -32,10 +32,10 @@ class UserModelViewSet(mixins.RetrieveModelMixin,
                        AutoPrefetchMixin,
                        GenericViewSet):
 
-    queryset = User.objects.get_actives()
+    queryset = User.objects.get_actives().order_by("first_name", "email")
     serializer_class = UserModelSerializer
     search_fields = ('first_name', 'last_name', 'email', )
-    permission_classes = (permissions.IsAuthenticated, IsUserOrFullAdmin, )
+    permission_classes = (permissions.IsAuthenticated, IsUserOrAdmin, )
 
     def get_serializer_class(self):
         # Due to rest-framework-json-api exception handling, we have to do soft check here se below:
