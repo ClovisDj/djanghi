@@ -32,7 +32,7 @@ def is_valid_uuid(uuid_str, version=4):
 
 
 def extract_user_from_request_token(request):
-    from apps.extensions.backend import CustomJWTAuthentication
+    from apps.custom_authentications import CustomJWTAuthentication
 
     try:
         is_authenticated = CustomJWTAuthentication().authenticate(request)

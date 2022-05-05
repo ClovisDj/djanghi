@@ -1,13 +1,6 @@
 from django.contrib.auth.backends import ModelBackend
-from django.contrib.auth.middleware import AuthenticationMiddleware
-from django.contrib.auth.models import AnonymousUser
 from rest_framework.filters import BaseFilterBackend
 from rest_framework_json_api.pagination import JsonApiPageNumberPagination
-from rest_framework_simplejwt.authentication import JWTAuthentication
-from rest_framework_simplejwt.exceptions import TokenError, AuthenticationFailed
-from rest_framework_simplejwt.settings import api_settings
-
-from apps.utils import extract_user_from_request_token
 
 
 class DjanghiModelBackend(ModelBackend):
@@ -47,17 +40,6 @@ class DjanghiModelBackend(ModelBackend):
         return user if self.user_can_authenticate(user) else None
 
 
-class CustomAuthenticationMiddleware(AuthenticationMiddleware):
-
-    def process_request(self, request):
-        super().process_request(request)
-
-        if isinstance(request.user, AnonymousUser):
-            user_from_token = extract_user_from_request_token(request)
-            if user_from_token:
-                request.user = user_from_token
-
-
 class AssociationFilterBackend(BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
         # At this point of the process any requester should be authenticated
@@ -66,31 +48,6 @@ class AssociationFilterBackend(BaseFilterBackend):
             return queryset.filter(association_id=request.user.association_id)
 
         return queryset
-
-
-class CustomJWTAuthentication(JWTAuthentication):
-
-    def authenticate(self, request):
-        try:
-            header = self.get_header(request)
-            raw_token = self.get_raw_token(header)
-            validated_token = self.get_validated_token(raw_token)
-
-            return self.get_user(validated_token), validated_token
-        except (AttributeError, AuthenticationFailed):
-            return None
-
-    def get_validated_token(self, raw_token):
-        """
-        Override this method so that we do not return 500 to the client instead we return 403
-        """
-        for AuthToken in api_settings.AUTH_TOKEN_CLASSES:
-            try:
-                return AuthToken(raw_token)
-            except TokenError:
-                pass
-
-        raise AuthenticationFailed()
 
 
 class CustomJsonApiPageNumberPagination(JsonApiPageNumberPagination):
