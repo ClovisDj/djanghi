@@ -10,7 +10,7 @@ from rest_framework_simplejwt.serializers import TokenObtainSerializer
 from rest_framework_simplejwt.settings import api_settings
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .models import User, UserRegistrationLink
+from .models import User, UserRegistrationLink, UserRole
 from ..associations.serializers import AssociationModelSerializer
 
 
@@ -59,6 +59,13 @@ class LoginSerializer(TokenObtainSerializer):
             update_last_login(None, self.user)
 
         return data
+
+
+class RoleModelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserRole
+        read_only_fields = ('value', 'description', )
+        fields = '__all__'
 
 
 class BaseUserModelSerializer(serializers.ModelSerializer):
@@ -127,6 +134,7 @@ class UserAdminModelSerializer(UserModelSerializer):
     is_payment_manager = serializers.SerializerMethodField()
     is_cost_manager = serializers.SerializerMethodField()
     is_cotisation_manager = serializers.SerializerMethodField()
+    roles = RoleModelSerializer(many=True, read_only=True)
 
     class Meta:
         model = User
