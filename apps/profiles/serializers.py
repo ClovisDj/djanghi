@@ -132,22 +132,20 @@ class UserAdminModelSerializer(UserModelSerializer):
     is_admin = serializers.SerializerMethodField()
     is_full_admin = serializers.SerializerMethodField()
     is_payment_manager = serializers.SerializerMethodField()
-    is_cost_manager = serializers.SerializerMethodField()
-    is_cotisation_manager = serializers.SerializerMethodField()
     roles = RoleModelSerializer(many=True, read_only=True)
 
     class Meta:
         model = User
         read_only_fields = (
-            'created_at',
-            'updated_at',
-            'date_joined',
-            'last_login',
             'is_registered',
             'email',
             'is_active',
         )
         exclude = (
+            'created_at',
+            'updated_at',
+            'date_joined',
+            'last_login',
             'password',
             'username',
             'groups',
@@ -167,14 +165,6 @@ class UserAdminModelSerializer(UserModelSerializer):
     @staticmethod
     def get_is_payment_manager(user):
         return user.is_payment_manager
-
-    @staticmethod
-    def get_is_cost_manager(user):
-        return user.is_cost_manager
-
-    @staticmethod
-    def get_is_cotisation_manager(user):
-        return user.is_cost_manager
 
 
 class UserRegistrationModelSerializer(serializers.ModelSerializer):

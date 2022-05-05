@@ -123,7 +123,7 @@ class User(AbstractUser):
     REQUIRED_FIELDS = ['username']
 
     class Meta:
-        ordering = ['-date_joined']
+        ordering = ['first_name', 'email']
         constraints = [
             models.UniqueConstraint(fields=['email', 'association'], name='unique_username_by_association')
         ]

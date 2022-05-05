@@ -109,8 +109,6 @@ class TestUserModelViewSet(ActMixin):
         assert 'is_admin' not in attributes
         assert 'is_full_admin' not in attributes
         assert 'is_payment_manager' not in attributes
-        assert 'is_cost_manager' not in attributes
-        assert 'is_cotisation_manager' not in attributes
 
     def test_admin_should_have_access_to_admin_info_details(self, authenticated_alice_user_client, abc_user,
                                                             alice_full_admin):
@@ -120,8 +118,6 @@ class TestUserModelViewSet(ActMixin):
         assert 'is_admin' in attributes
         assert 'is_full_admin' in attributes
         assert 'is_payment_manager' in attributes
-        assert 'is_cost_manager' in attributes
-        assert 'is_cotisation_manager' in attributes
 
     def test_regular_user_cannot_add_a_role(self, authenticated_alice_user_client, user_alice, abc_user):
         user_alice.roles.clear()

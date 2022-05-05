@@ -35,7 +35,7 @@ class UserModelViewSet(mixins.RetrieveModelMixin,
                        AutoPrefetchMixin,
                        GenericViewSet):
 
-    queryset = User.objects.get_actives().order_by("first_name", "email")
+    queryset = User.objects.get_actives().prefetch_related('roles')
     serializer_class = UserModelSerializer
     search_fields = ('first_name', 'last_name', 'email', )
     permission_classes = (permissions.IsAuthenticated, IsUserOrAdmin, )

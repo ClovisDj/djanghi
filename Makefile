@@ -3,7 +3,7 @@ user-shell := docker-compose run --rm -e LOCAL_USER_ID=`id -u $$USER` -e LOCAL_G
 	--entrypoint /entrypoint.sh django-shell
 
 build:
-	docker-compose build "$(S)"
+	docker-compose build
 
 poetry:
 	$(user-shell) sh -c "virtualenv .virtualenv && source .virtualenv/bin/activate && poetry $(O)"
