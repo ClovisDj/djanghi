@@ -1,6 +1,7 @@
 from django.urls import reverse
 from rest_framework import status
 
+from apps.profiles import roles
 from tests import ActMixin
 
 
@@ -108,8 +109,6 @@ class TestUserModelViewSet(ActMixin):
         assert 'is_admin' not in attributes
         assert 'is_full_admin' not in attributes
         assert 'is_payment_manager' not in attributes
-        assert 'is_cost_manager' not in attributes
-        assert 'is_cotisation_manager' not in attributes
 
     def test_admin_should_have_access_to_admin_info_details(self, authenticated_alice_user_client, abc_user,
                                                             alice_full_admin):
@@ -119,5 +118,63 @@ class TestUserModelViewSet(ActMixin):
         assert 'is_admin' in attributes
         assert 'is_full_admin' in attributes
         assert 'is_payment_manager' in attributes
-        assert 'is_cost_manager' in attributes
-        assert 'is_cotisation_manager' in attributes
+
+    def test_regular_user_cannot_add_a_role(self, authenticated_alice_user_client, user_alice, abc_user):
+        user_alice.roles.clear()
+        assert not user_alice.is_admin
+
+        self.act(
+            f'{self.detail_url(abc_user.id)}/admin',
+            authenticated_alice_user_client,
+            method='post',
+            data={'roles': ['a', 'b']},
+            status_code=status.HTTP_403_FORBIDDEN
+        )
+
+    def test_cost_manager_cannot_add_a_role(self, authenticated_alice_user_client, user_alice, abc_user):
+        user_alice.add_roles(roles.PAYMENT_MANAGER)
+        assert not user_alice.is_full_admin
+        assert user_alice.is_admin
+
+        self.act(
+            f'{self.detail_url(abc_user.id)}/admin',
+            authenticated_alice_user_client,
+            method='post',
+            data={'roles': ['a', 'b']},
+            status_code=status.HTTP_403_FORBIDDEN
+        )
+
+    def test_full_admin_can_add_roles(self, authenticated_alice_user_client, alice_full_admin, abc_user):
+        abc_user.roles.clear()
+        assert not abc_user.is_admin
+
+        self.act(
+            f'{self.detail_url(abc_user.id)}/admin',
+            authenticated_alice_user_client,
+            method='post',
+            data={'roles': ['a', 'b']},
+            status_code=status.HTTP_204_NO_CONTENT
+        )
+
+        abc_user.refresh_from_db()
+        assert abc_user.is_admin
+        assert abc_user.is_full_admin
+
+    def test_full_admin_can_revoke_roles(self, authenticated_alice_user_client, alice_full_admin, abc_user):
+        abc_user.add_roles(*[roles.FULL_ADMIN, roles.COTISATION_MANAGER, roles.COST_MANAGER])
+        assert abc_user.is_admin
+        assert abc_user.is_full_admin
+        assert abc_user.is_cotisation_manager
+
+        self.act(
+            f'{self.detail_url(abc_user.id)}/admin',
+            authenticated_alice_user_client,
+            method='post',
+            data={'roles': []},
+            status_code=status.HTTP_204_NO_CONTENT
+        )
+
+        abc_user.refresh_from_db()
+        assert not abc_user.is_admin
+        assert not abc_user.is_full_admin
+        assert not abc_user.is_cotisation_manager

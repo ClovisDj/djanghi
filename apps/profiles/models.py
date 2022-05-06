@@ -54,7 +54,6 @@ class CustomUserManager(UserManager):
     def get_actives(self):
         return self.filter(
             is_active=True,
-            is_registered=True,
             association__is_active=True,
             association_id__isnull=False,
         )
@@ -124,7 +123,7 @@ class User(AbstractUser):
     REQUIRED_FIELDS = ['username']
 
     class Meta:
-        ordering = ['-date_joined']
+        ordering = ['first_name', 'email']
         constraints = [
             models.UniqueConstraint(fields=['email', 'association'], name='unique_username_by_association')
         ]

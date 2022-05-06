@@ -81,7 +81,7 @@ PACKAGE_MIDDLEWARES = [
 ]
 
 CUSTOM_MIDDLEWARES = [
-    'apps.extensions.backend.CustomAuthenticationMiddleware',
+    'apps.middlewares.CustomAuthenticationMiddleware',
 ]
 
 MIDDLEWARE = BASE_MIDDLEWARES + PACKAGE_MIDDLEWARES + CUSTOM_MIDDLEWARES

@@ -10,7 +10,7 @@ from rest_framework_simplejwt.serializers import TokenObtainSerializer
 from rest_framework_simplejwt.settings import api_settings
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .models import User, UserRegistrationLink
+from .models import User, UserRegistrationLink, UserRole
 from ..associations.serializers import AssociationModelSerializer
 
 
@@ -61,7 +61,19 @@ class LoginSerializer(TokenObtainSerializer):
         return data
 
 
+class RoleModelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserRole
+        read_only_fields = ('value', 'description', )
+        fields = '__all__'
+
+
 class BaseUserModelSerializer(serializers.ModelSerializer):
+    first_name = serializers.CharField(max_length=150, allow_blank=True, allow_null=True)
+    last_name = serializers.CharField(max_length=150, allow_blank=True, allow_null=True)
+    city_of_birth = serializers.CharField(max_length=100, allow_blank=True, allow_null=True)
+    country_of_birth = serializers.CharField(max_length=100, allow_blank=True, allow_null=True)
+    date_of_birth = serializers.DateField(allow_null=True)
 
     class Meta:
         model = User
@@ -120,21 +132,20 @@ class UserAdminModelSerializer(UserModelSerializer):
     is_admin = serializers.SerializerMethodField()
     is_full_admin = serializers.SerializerMethodField()
     is_payment_manager = serializers.SerializerMethodField()
-    is_cost_manager = serializers.SerializerMethodField()
-    is_cotisation_manager = serializers.SerializerMethodField()
+    roles = RoleModelSerializer(many=True, read_only=True)
 
     class Meta:
         model = User
         read_only_fields = (
-            'created_at',
-            'updated_at',
-            'date_joined',
-            'last_login',
             'is_registered',
             'email',
             'is_active',
         )
         exclude = (
+            'created_at',
+            'updated_at',
+            'date_joined',
+            'last_login',
             'password',
             'username',
             'groups',
@@ -155,19 +166,11 @@ class UserAdminModelSerializer(UserModelSerializer):
     def get_is_payment_manager(user):
         return user.is_payment_manager
 
-    @staticmethod
-    def get_is_cost_manager(user):
-        return user.is_cost_manager
-
-    @staticmethod
-    def get_is_cotisation_manager(user):
-        return user.is_cost_manager
-
 
 class UserRegistrationModelSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(write_only=True)
-    first_name = serializers.CharField(write_only=True, required=False)
-    last_name = serializers.CharField(write_only=True, required=False)
+    first_name = serializers.CharField(write_only=True, required=False, allow_blank=True)
+    last_name = serializers.CharField(write_only=True, required=False, allow_blank=True)
 
     is_active = serializers.BooleanField(read_only=True)
 

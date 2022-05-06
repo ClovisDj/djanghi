@@ -1,17 +1,21 @@
 import json
 
 from django.conf import settings
+from django.db import transaction
 from django.http import HttpResponseNotFound, HttpResponseRedirect
 from django.shortcuts import render
 from django.utils import timezone
 from django.views import View
 
-from rest_framework import mixins, permissions
+from rest_framework import mixins, permissions, status
+from rest_framework.decorators import action
+from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
+from rest_framework_json_api.views import AutoPrefetchMixin
 from rest_framework_simplejwt.views import TokenObtainPairView
 
 from apps.associations.models import Association
-from apps.permissions import IsUserOrFullAdmin
+from apps.permissions import IsUserOrAdmin, IsFullAdmin
 from apps.profiles import serializers, roles
 from apps.profiles.models import User, UserRegistrationLink
 from apps.profiles.serializers import UserModelSerializer, UserAdminModelSerializer, UserRegistrationModelSerializer, \
@@ -28,11 +32,13 @@ class UserModelViewSet(mixins.RetrieveModelMixin,
                        mixins.UpdateModelMixin,
                        mixins.DestroyModelMixin,
                        mixins.ListModelMixin,
+                       AutoPrefetchMixin,
                        GenericViewSet):
 
-    queryset = User.objects.get_actives()
+    queryset = User.objects.get_actives().prefetch_related('roles')
     serializer_class = UserModelSerializer
-    permission_classes = (permissions.IsAuthenticated, IsUserOrFullAdmin, )
+    search_fields = ('first_name', 'last_name', 'email', )
+    permission_classes = (permissions.IsAuthenticated, IsUserOrAdmin, )
 
     def get_serializer_class(self):
         # Due to rest-framework-json-api exception handling, we have to do soft check here se below:
@@ -42,15 +48,28 @@ class UserModelViewSet(mixins.RetrieveModelMixin,
             return UserAdminModelSerializer
         return super().get_serializer_class()
 
+    @transaction.atomic
+    def update(self, request, *args, **kwargs):
+        return super().update(request, *args, **kwargs)
+
     def perform_destroy(self, instance):
         instance.is_active = False
         instance.save()
+
+    @action(detail=True, methods=['post'], permission_classes=[IsFullAdmin])
+    @transaction.atomic
+    def admin(self, request, pk=None):
+        user_obj = self.get_object()
+        user_obj.roles.clear()
+        user_obj.add_roles(*request.data.get('roles', []))
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class UserRegistrationViewSet(mixins.CreateModelMixin,
                               mixins.RetrieveModelMixin,
                               mixins.UpdateModelMixin,
                               mixins.ListModelMixin,
+                              AutoPrefetchMixin,
                               GenericViewSet):
 
     queryset = UserRegistrationLink.objects.all()

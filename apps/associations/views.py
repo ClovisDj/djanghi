@@ -3,6 +3,7 @@ from rest_framework import mixins, serializers, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
+from rest_framework_json_api.views import AutoPrefetchMixin
 
 from apps.associations.models import MemberContributionField
 from apps.associations.serializers import MemberContributionFieldModelSerializer
@@ -14,6 +15,7 @@ class MembershipContributionFieldsModelViewSet(mixins.CreateModelMixin,
                                                mixins.ListModelMixin,
                                                mixins.RetrieveModelMixin,
                                                mixins.DestroyModelMixin,
+                                               AutoPrefetchMixin,
                                                GenericViewSet):
 
     queryset = MemberContributionField.objects.active().all()

@@ -44,7 +44,7 @@ class Migration(migrations.Migration):
                 ('association', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='users', to='associations.association')),
             ],
             options={
-                'ordering': ['-date_joined'],
+                'ordering': ['first_name', 'email'],
             },
             managers=[
                 ('objects', apps.profiles.models.CustomUserManager()),
