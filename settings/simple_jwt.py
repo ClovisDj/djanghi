@@ -1,7 +1,7 @@
 from datetime import timedelta
-import environ
 
-ENV = environ.Env()
+from .base import ENV
+
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=ENV.int('ACCESS_TOKEN_LIFETIME')),

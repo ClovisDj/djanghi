@@ -1,8 +1,4 @@
-import environ
-
-ENV = environ.Env()
-
-log_level = ENV.str('DJANGO_LOG_LEVEL')
+from .base import ENV
 
 LOGGING = {
     'version': 1,
