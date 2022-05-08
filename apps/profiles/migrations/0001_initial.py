@@ -36,6 +36,7 @@ class Migration(migrations.Migration):
                 ('email', models.EmailField(db_index=True, max_length=254)),
                 ('date_joined', models.DateTimeField(default=django.utils.timezone.now, verbose_name='date joined')),
                 ('is_registered', models.BooleanField(default=False)),
+                ('should_send_activation', models.BooleanField(default=False)),
                 ('date_of_birth', models.DateField(blank=True, null=True)),
                 ('city_of_birth', models.CharField(blank=True, max_length=100, null=True)),
                 ('country_of_birth', models.CharField(blank=True, max_length=100, null=True)),

@@ -245,6 +245,7 @@ class UserRegistrationLink(CreateUpdateDateMixin, UUIDModelMixin, models.Model):
     expiration_date = models.DateTimeField(null=False, blank=False)
     send_time = models.DateTimeField(null=True, blank=True)
     is_deactivated = models.BooleanField(default=False)
+    should_send_activation = models.BooleanField(default=False)
     link = models.URLField(null=False, blank=False)
 
     class Meta:

@@ -19,4 +19,5 @@ class ProfilesConfig(AppConfig):
             logger.info(f'{created}, object created: {bool_value}')
 
     def ready(self):
+        import apps.profiles.signals    # Import needed for signal to work
         post_migrate.connect(self.create_role_objects, sender=self)
