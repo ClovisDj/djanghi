@@ -1,9 +1,14 @@
+import copy
 import datetime
+from django.core.mail.message import EmailMultiAlternatives
+from django.core import mail
+from django.conf import settings
 from django.test import Client
 from django.urls import reverse
 from django.utils import timezone
 from rest_framework import status
 
+from apps.profiles import roles
 from tests import ActMixin
 
 
@@ -81,6 +86,46 @@ class TestUserRegistrationLink(ActMixin):
         inactive_abc_user_registration_link.refresh_from_db()
         assert attributes['is_active']
         assert inactive_abc_user_registration_link.is_active
+
+    def test_a_payments_manager_cannot_send_a_user_registration_link_email_without_correct_params(
+            self, authenticated_alice_user_client, user_alice):
+
+        user_alice.add_roles(roles.PAYMENT_MANAGER)
+        user_alice.refresh_from_db()
+        assert user_alice.is_payment_manager
+        create_data = copy.deepcopy(self.create_data)
+        create_data['should_send_activation'] = False
+
+        self.act(
+            self.list_url,
+            authenticated_alice_user_client,
+            data=create_data,
+            status_code=status.HTTP_201_CREATED
+        )
+
+        assert len(mail.outbox) == 0
+
+    def test_a_payments_manager_can_send_a_user_registration_link_email(self, authenticated_alice_user_client,
+                                                                        user_alice):
+        user_alice.add_roles(roles.PAYMENT_MANAGER)
+        user_alice.refresh_from_db()
+        assert user_alice.is_payment_manager
+        create_data = copy.deepcopy(self.create_data)
+        create_data['should_send_activation'] = True
+
+        self.act(
+            self.list_url,
+            authenticated_alice_user_client,
+            data=create_data,
+            status_code=status.HTTP_201_CREATED
+        )
+
+        assert len(mail.outbox) == 1
+        out_email = mail.outbox[0]
+        assert len(out_email.to) == 1
+        assert out_email.to[0] == create_data['email']
+        assert out_email.from_email == settings.DEFAULT_FROM_EMAIL
+        assert len(out_email.alternatives) == 1
 
 
 class TestUserRegistrationPage:
