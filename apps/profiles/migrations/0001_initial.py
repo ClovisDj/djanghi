@@ -73,6 +73,7 @@ class Migration(migrations.Migration):
                 ('expiration_date', models.DateTimeField()),
                 ('send_time', models.DateTimeField(blank=True, null=True)),
                 ('is_deactivated', models.BooleanField(default=False)),
+                ('should_send_activation', models.BooleanField(default=False)),
                 ('link', models.URLField()),
                 ('association', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='registration_links', to='associations.association')),
                 ('author', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='authored_registration_links', to=settings.AUTH_USER_MODEL)),
