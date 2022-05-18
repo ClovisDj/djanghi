@@ -34,3 +34,31 @@ This repository comes with some fixtures that can be loaded with:
 ```
 make load-data
 ```
+## Sample .env values
+
+```dotenv
+# Django
+ENVIRONMENT=local
+SECRET_KEY=dummpy-secret-key
+DEBUG=True
+DJANGO_LOG_LEVEL=DEBUG
+ALLOWED_HOSTS=localhost,0.0.0.0
+CORS_ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
+API_HOST=http://localhost:8000
+FRONT_END_HOST=http://localhost:3000
+# Postgres
+POSTGRES_USER=psql-user
+POSTGRES_PASSWORD=password
+POSTGRES_HOST=psql
+POSTGRES_DB=djanghi-db
+DB_PORT=5432
+# Simple jwt & drf
+ACCESS_TOKEN_LIFETIME=5
+REFRESH_TOKEN_LIFETIME=360
+JWT_SECRET_KEY=super-secret-key!
+AUTH_HEADER_TYPES=JWT
+PAGE_SIZE=15
+# Anymail
+SENDGRID_API_KEY=hahahaahahhaha
+DEFAULT_FROM_EMAIL=noreply@yourdomain.com
+```
