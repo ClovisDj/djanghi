@@ -1,0 +1,88 @@
+{% extends "emails/base.html" %}
+
+{% block title %}
+ <title>Djanghi - Registration invite</title>
+{% endblock %}
+
+
+{% block body %}
+<!--[if mso | IE]></td></tr></table><table align="center" border="0" cellpadding="0" cellspacing="0" class="" style="width:600px;" width="600" bgcolor="#FFFFFF" ><tr><td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;"><![endif]-->
+<div style="background:#FFFFFF;background-color:#FFFFFF;margin:0px auto;max-width:600px;">
+  <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background:#FFFFFF;background-color:#FFFFFF;width:100%;">
+    <tbody>
+      <tr>
+        <td style="direction:ltr;font-size:0px;padding:20px 20px 0 20px;text-align:center;">
+          <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td class="" style="vertical-align:top;width:560px;" ><![endif]-->
+          <div class="mj-column-per-100 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;">
+            <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%">
+              <tbody>
+                <tr>
+                  <td align="left" style="font-size:0px;padding:30px 40px 10px 40px;word-break:break-word;">
+                    <div style="font-family:Montserrat, Helvetica, Arial, sans-serif;font-size:16px;font-weight:300;line-height:40x;text-align:left;color:#666666;">Hello,</div>
+                  </td>
+                </tr>
+                <tr>
+                  <td align="left" style="font-size:0px;padding:10px 40px 10px 40px;word-break:break-word;">
+                      <div style="font-family:Montserrat, Helvetica, Arial, sans-serif;font-size:16px;font-weight:300;line-height:40x;text-align:left;color:#666666;">
+                          On behalf of <strong>{{ association_label }}</strong>, we are excited to invite yo to our platform.
+                          Where you can track your association payments, status, events and many more.
+                      </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td align="left" style="font-size:0px;padding:10px 40px 20px 40px;word-break:break-word;">
+                    <div style="font-family:Montserrat, Helvetica, Arial, sans-serif;font-size:16px;font-weight:300;line-height:40x;text-align:left;color:#666666;">Please click the button below to complete your registration.</div>
+                  </td>
+                </tr>
+                <tr>
+                  <td align="center" vertical-align="middle" style="font-size:0px;padding:10px 25px;padding-top:20PX;padding-bottom:20px;word-break:break-word;">
+                    <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="border-collapse:separate;line-height:100%;">
+                      <tr>
+                        <td align="center" bgcolor="#012970" role="presentation" style="border:none;border-radius:2px;cursor:auto;mso-padding-alt:15px 30px;background:#012970;" valign="middle">
+                          <a href="{{ registration_link }}" style="display:inline-block;background:#012970;color:#FFFFFF;font-family:Montserrat, Helvetica, Arial, sans-serif;font-size:14px;font-weight:500;line-height:120%;margin:0;text-decoration:none;text-transform:none;padding:15px 30px;mso-padding-alt:0px;border-radius:2px;" target="_blank">
+                              REGISTER
+                          </a>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td align="left" style="font-size:0px;padding:10px 40px 10px 40px;word-break:break-word;">
+                    <div style="font-family:Montserrat, Helvetica, Arial, sans-serif;font-size:16px;font-weight:300;line-height:40x;text-align:left;color:#666666;">If that doesn't work, copy and paste the following link in your browser:</div>
+                  </td>
+                </tr>
+                <tr>
+                  <td align="left" style="font-size:0px;padding:10px 40px 10px 40px;word-break:break-word;">
+                    <div style="font-family:Montserrat, Helvetica, Arial, sans-serif;font-size:16px;font-weight:300;line-height:40x;text-align:left;color:#666666;">
+                        {{ registration_link }}
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td align="left" style="font-size:0px;padding:10px 40px 10px 40px;word-break:break-word;">
+                    <div style="font-family:Montserrat, Helvetica, Arial, sans-serif;font-size:16px;font-weight:300;line-height:40x;text-align:left;color:#666666;">
+                        For any other questions, please contact your association administrators or send an email at <strong>info@djanghi.com</strong>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td align="left" style="font-size:0px;padding:10px 40px 10px 40px;word-break:break-word;">
+                    <div style="font-family:Montserrat, Helvetica, Arial, sans-serif;font-size:16px;font-weight:300;line-height:40x;text-align:left;color:#666666;">Cheers,</div>
+                  </td>
+                </tr>
+                <tr>
+                  <td align="left" style="font-size:0px;padding:10px 40px 30px 40px;word-break:break-word;">
+                    <div style="font-family:Montserrat, Helvetica, Arial, sans-serif;font-size:16px;font-weight:300;line-height:40x;text-align:left;color:#666666;">Djanghi Team</div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <!--[if mso | IE]></td></tr></table><![endif]-->
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+{% endblock %}

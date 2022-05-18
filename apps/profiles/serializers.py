@@ -252,6 +252,7 @@ class UserRegistrationModelSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         instance.expiration_date = self.generate_expiration_date()
+        instance.send_time = None   # To allow resending the link is required
         instance.save()
 
         return instance
