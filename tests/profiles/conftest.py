@@ -6,6 +6,11 @@ from django.utils import timezone
 from apps.profiles.models import UserRegistrationLink
 
 
+@pytest.fixture(autouse=True)
+def email_backend_setup(settings):
+    settings.EMAIL_BACKEND = 'anymail.backends.test.EmailBackend'
+
+
 @pytest.fixture
 def inactive_abc_user_registration_link(inactive_abc_user, alice_full_admin):
     return UserRegistrationLink.objects.create(
