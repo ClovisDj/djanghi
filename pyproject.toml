@@ -13,7 +13,7 @@ authors = [
 python = "==3.8.*"
 
 django-anymail = "^8.5"
-Django = "==3.2.12"
+Django = "==4.0"
 django-admin-rangefilter = "~0.5"
 django-cors-headers = ">=3.10.0"
 django-enumfields = "==2.0.0"
