@@ -69,8 +69,8 @@ class RoleModelSerializer(serializers.ModelSerializer):
 
 
 class BaseUserModelSerializer(serializers.ModelSerializer):
-    first_name = serializers.CharField(max_length=150, allow_blank=True, allow_null=True)
-    last_name = serializers.CharField(max_length=150, allow_blank=True, allow_null=True)
+    first_name = serializers.CharField(max_length=150, allow_blank=True)
+    last_name = serializers.CharField(max_length=150, allow_blank=True)
     city_of_birth = serializers.CharField(max_length=100, allow_blank=True, allow_null=True)
     country_of_birth = serializers.CharField(max_length=100, allow_blank=True, allow_null=True)
     date_of_birth = serializers.DateField(allow_null=True)
