@@ -1,24 +1,32 @@
 version: '3.9'
 
 services:
-  djanghi_api:
+  djanghi-api:
     build:
       context: .
     image: djanghi/prod
-    command: gunicorn djanghi_api.wsgi:application --bind 0.0.0.0:8000
+    command: gunicorn apps.wsgi:application --bind 0.0.0.0:8070 -w 5
     volumes:
-      - static_volume:/var/djanghi/staticfiles
+      - static_volume:/var/djanghi/static
     expose:
-      - 8000
+      - "8070"
+    networks:
+      - djanghi-network
+
   nginx:
     build: ./nginx
     volumes:
-      - static_volume:/var/djanghi/staticfiles
+      - static_volume:/var/djanghi/static
     ports:
-      - "1337:80"
+      - "8080:80"
     depends_on:
-      - djanghi_api
+      - djanghi-api
+    networks:
+      - djanghi-network
+
+networks:
+  djanghi-network:
+    name: djanghi-network
 
 volumes:
-  postgres_data:
   static_volume:
