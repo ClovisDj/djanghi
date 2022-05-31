@@ -1,0 +1,44 @@
+name: Djanghi CI Tests
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  test:
+    name: Build and run pytests
+    runs-on: ubuntu-latest
+    environment: CI Tests
+    steps:
+      - name: Add environment variables to .env
+        run: |
+          echo DEBUG=0 >> .env
+          echo ENVIRONMENT=${{ secrets.ENVIRONMENT }} >> .env
+          echo SECRET_KEY=${{ secrets.SECRET_KEY }} >> .env
+          echo ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS }} >> .env
+          echo API_HOST=${{ secrets.API_HOST }} >> .env
+          echo DJANGO_LOG_LEVEL=${{ secrets.DJANGO_LOG_LEVEL }} >> .env
+          echo FRONT_END_HOST=${{ secrets.FRONT_END_HOST }} >> .env
+          echo POSTGRES_USER=${{ secrets.POSTGRES_USER }} >> .env
+          echo POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} >> .env
+          echo POSTGRES_HOST=${{ secrets.POSTGRES_HOST }} >> .env
+          echo POSTGRES_DB=${{ secrets.POSTGRES_DB }} >> .env
+          echo DB_PORT=${{ secrets.DB_PORT }} >> .env
+          echo ACCESS_TOKEN_LIFETIME=${{ secrets.ACCESS_TOKEN_LIFETIME }} >> .env
+          echo REFRESH_TOKEN_LIFETIME=${{ secrets.ACCESS_TOKEN_LIFETIME }} >> .env
+          echo JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }} >> .env
+          echo AUTH_HEADER_TYPES=${{ secrets.AUTH_HEADER_TYPES }} >> .env
+          echo PAGE_SIZE=${{ secrets.PAGE_SIZE }} >> .env
+          echo SENDGRID_API_KEY=${{ secrets.SENDGRID_API_KEY }} >> .env
+          echo DEFAULT_FROM_EMAIL=${{ secrets.DEFAULT_FROM_EMAIL }} >> .env
+          echo CORS_ALLOWED_ORIGINS=${{ secrets.CORS_ALLOWED_ORIGINS }} >> .env
+      - uses: actions/checkout@v2
+      - name: Build images
+        run: |
+          make build-CI
+          make build
+      - name: Run Tests
+        run: |
+          make pytest

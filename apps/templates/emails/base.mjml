@@ -1,0 +1,51 @@
+<mjml>
+  <mj-head>
+    <mj-title>Djanghi Registration Invi</mj-title>
+    <mj-font name="Poppins" href="https://fonts.googleapis.com/css?family=Montserrat:300,400,500"></mj-font>
+    <mj-attributes>
+      <mj-all font-family="Montserrat, Helvetica, Arial, sans-serif"></mj-all>
+      <mj-text font-weight="400" font-size="16px" color="#000000" line-height="24px"></mj-text>
+      <mj-section padding="0px"></mj-section>
+    </mj-attributes>
+  </mj-head>
+  <mj-body background-color="#F2F2F2">
+    <mj-section padding="50px 0 20px 0">
+
+    </mj-section>
+    <mj-section padding="40px 20px 0 20px" background-color="#FFFFFF">
+      <mj-column width="35%">
+        <mj-text align="center" font-size="30px" font-weight="550" color="#012970">Djanghi</mj-text>
+      </mj-column>
+    </mj-section>
+    <mj-section padding="10px 20px 0 20px" background-color="#FFFFFF">
+      <mj-column width="100%">
+        <mj-text color="#012970" background-color=" rgb(231, 233, 232)" height="2px" width="100%"></mj-text>
+      </mj-column>
+    </mj-section>
+    <mj-section padding="20px 20px 0 20px" background-color="#FFFFFF">
+      <mj-column>
+        <mj-text font-weight="300" padding="50px 40px 10px 40px" line-height="40x" color="#666666">Hello,</mj-text>
+        <mj-text font-weight="300" padding="10px 40px 10px 40px" line-height="40x" color="#666666">On behalf of Mebam administrators, we are excited to extend you this registration invite.</mj-text>
+        <mj-text font-weight="300" padding="10px 40px 20px 40px" line-height="40x" color="#666666">Please click the button below to complete your registration.</mj-text>
+        <mj-button align="center" background-color="#012970" color="#FFFFFF" border-radius="2px" href="#" inner-padding="15px 30px" padding-bottom="20px" padding-top="20PX">REGISTER</mj-button>
+        <mj-text font-weight="300" padding="10px 40px 10px 40px" line-height="40x" color="#666666">If that doesn't work, copy and paste the following link in your browser:</mj-text>
+        <mj-text font-weight="300" padding="10px 40px 10px 40px" line-height="40x" color="#666666">http://localhost:8000/activate/3c70c8be-a01f-40b2-bfca-3e748349fd8e/7bb47a61-d7ea-4f06-b8c0-496ff15e4e37/b761d4ff-5b47-4cf2-bafa-afefdeaaa06d</mj-text>
+        <mj-text font-weight="300" padding="10px 40px 10px 40px" line-height="40x" color="#666666">For any other questions, please contact your association administrators or send an email at help@djanghi.com</mj-text>
+        <mj-text font-weight="300" padding="10px 40px 10px 40px" line-height="40x" color="#666666">Cheers,</mj-text>
+        <mj-text font-weight="300" padding="10px 40px 30px 40px" line-height="40x" color="#666666">Djanghi Team</mj-text>
+      </mj-column>
+    </mj-section>
+
+
+    <mj-section padding="50px 0 0 0" background-color="#FFFFFF">
+      <mj-column>
+        <mj-image src="http://nimus.de/share/tpl-card/bottom.png" alt="bottom border" align="center" border="none" padding="0px"></mj-image>
+      </mj-column>
+    </mj-section>
+    <mj-section padding="10px 0 10px 0">
+      <mj-column>
+        <mj-text align="center" color="#9B9B9B" font-size="10px"><a href="#" style="color: #9B9B9B;">Unsubscribe</a> from this newsletter<br>52 Edison Court Suite 259 / East Aidabury / Cambodi<br> <a href="#" style="color: #9B9B9B; text-decoration:none;">Djanghi</a></mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

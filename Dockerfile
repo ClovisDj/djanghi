@@ -43,7 +43,7 @@ FROM build AS prod
 
 COPY . /app/
 RUN \[ -d "$VIRTUAL_ENV" \] || virtualenv "$VIRTUAL_ENV"
-RUN . "$VIRTUAL_ENV/bin/activate"
+RUN . "$VIRTUAL_ENV/bin/activate" && poetry install --no-dev
 
 # Generate static assets
 RUN python manage.py collectstatic -c --noinput
