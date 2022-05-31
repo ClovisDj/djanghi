@@ -28,6 +28,8 @@ FROM base AS build
 
 # Essential packages for building python packages
 RUN apk add --no-cache build-base git libffi-dev linux-headers jpeg-dev freetype-dev postgresql-dev su-exec
+RUN \[ -d "$VIRTUAL_ENV" \] || virtualenv "$VIRTUAL_ENV"
+RUN . "$VIRTUAL_ENV/bin/activate" && poetry install
 
 COPY . /app/
 
