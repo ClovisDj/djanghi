@@ -28,14 +28,14 @@ FROM base AS build
 
 # Essential packages for building python packages
 RUN apk add --no-cache build-base git libffi-dev linux-headers jpeg-dev freetype-dev postgresql-dev su-exec
-RUN \[ -d "$VIRTUAL_ENV" \] || virtualenv "$VIRTUAL_ENV"
-RUN . "$VIRTUAL_ENV/bin/activate" && poetry install
 
 COPY . /app/
 
 ## Image with additional dependencies for local docker usage ##
 ## ========================================================= ##
 FROM build as local
+RUN \[ -d "$VIRTUAL_ENV" \] || virtualenv "$VIRTUAL_ENV"
+RUN . "$VIRTUAL_ENV/bin/activate" && poetry install
 RUN chmod -R 777 /root/  ## Grant all local users access to poetry
 RUN apk add gdb
 
