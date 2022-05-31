@@ -43,7 +43,11 @@ down:
 n := 2
 # Ex: make pytest n=6
 pytest:
+	$(user-shell) bash -c "pytest -n $(n) --cov=apps --cov-report=term"
+
+CI-pytest:
 	docker network create djanghi-portal || true
+	$(MAKE) poetry-install
 	$(user-shell) bash -c "pytest -n $(n) --cov=apps --cov-report=term"
 
 # Use caution with the below command since it will wipe out your local postgres db

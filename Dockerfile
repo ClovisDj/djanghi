@@ -34,8 +34,6 @@ COPY . /app/
 ## Image with additional dependencies for local docker usage ##
 ## ========================================================= ##
 FROM build as local
-RUN \[ -d "$VIRTUAL_ENV" \] || virtualenv "$VIRTUAL_ENV"
-RUN . "$VIRTUAL_ENV/bin/activate" && poetry install
 RUN chmod -R 777 /root/  ## Grant all local users access to poetry
 RUN apk add gdb
 
