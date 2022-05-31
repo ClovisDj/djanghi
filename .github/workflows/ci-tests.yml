@@ -35,8 +35,8 @@ jobs:
           envkey_SENDGRID_API_KEY=${{ secrets.SENDGRID_API_KEY }}
           envkey_DEFAULT_FROM_EMAIL=${{ secrets.DEFAULT_FROM_EMAIL }}
           envkey_CORS_ALLOWED_ORIGINS=${{ secrets.CORS_ALLOWED_ORIGINS }}
-          file_name: .env
-          fail_on_empty: false
+          file_name=.env
+          fail_on_empty=false
       - uses: actions/checkout@v2
       - name: Build images
         run: |
