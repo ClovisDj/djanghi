@@ -84,7 +84,3 @@ jobs:
         - name: Build images
           run: |
             docker-compose -f docker-compose.c.yml build
-#        - name: Push images
-#          run: |
-#            docker push ${{ env.WEB_IMAGE }}
-#            docker push ${{ env.NGINX_IMAGE }}
