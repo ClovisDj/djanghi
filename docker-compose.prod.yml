@@ -5,7 +5,7 @@ services:
     build:
       context: .
     image: djanghi/prod
-    command: gunicorn apps.wsgi:application --bind 0.0.0.0:8070 -w 5
+    command: gunicorn apps.wsgi:application --bind 0.0.0.0:8070 -w 4 -t 60
     volumes:
       - static_volume:/var/djanghi/static
     expose:
@@ -15,6 +15,7 @@ services:
 
   nginx:
     build: ./nginx
+    image: djanghi/nginx
     volumes:
       - static_volume:/var/djanghi/static
     ports:
