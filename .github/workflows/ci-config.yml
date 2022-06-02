@@ -1,4 +1,4 @@
-name: Djanghi Pipeliine
+name: Djanghi Pipeline
 
 on:
   push:
@@ -13,7 +13,7 @@ jobs:
     environment: CI Tests
     steps:
       - uses: actions/checkout@v2
-      - name: Make envfile
+      - name: Make and populate .env file
         uses: SpicyPizza/create-envfile@v1.3
         with:
           envkey_DEBUG: ${{ secrets.DEBUG }}
@@ -44,15 +44,14 @@ jobs:
         run: make CI-pytest
 
   deploy:
-    name: Deploy images
+    name: Build and deploy images
     runs-on: ubuntu-latest
     environment: prod
     needs: tests
-    if: github.ref == 'refs/heads/master'
+#    if: github.ref == 'refs/heads/master'
     steps:
-      - name: Checkout master
-        uses: actions/checkout@v2
-      - name: Make envfile
+      - uses: actions/checkout@v2
+      - name: Make and populate .env file
         uses: SpicyPizza/create-envfile@v1.3
         with:
           envkey_DEBUG: ${{ secrets.DEBUG }}
@@ -81,6 +80,10 @@ jobs:
         run: echo ${PACKAGE_ACCESS_TOKEN} | docker login ghcr.io -u ${{ secrets.NAMESPACE }} --password-stdin
         env:
           PACKAGE_ACCESS_TOKEN: ${{ secrets.PACKAGE_ACCESS_TOKEN }}
-        - name: Build images
-          run: |
-            docker-compose -f docker-compose.c.yml build
+      - name: Build images
+        run: |
+          docker-compose -f docker-compose.prod.yml build
+      - name: push images to github packages
+        run: |
+          docker push djanghi/prod
+          docker push djanghi/nginx
