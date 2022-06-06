@@ -86,5 +86,5 @@ jobs:
           docker-compose -f docker-compose.prod.yml build
       - name: push images to github packages
         run: |
-          docker push djanghi/prod
-          docker push djanghi/nginx
+          docker push ghcr.io/${{ secrets.REGISTRY_USERNAME }}/${{ secrets.API_IMAGE_NAME }}
+          docker push ghcr.io/${{ secrets.REGISTRY_USERNAME }}/${{ secrets.NGINX_IMAGE }}
