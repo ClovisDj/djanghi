@@ -90,5 +90,5 @@ jobs:
           docker-compose -f docker-compose.prod.yml build
       - name: push images to github packages
         run: |
-          docker push ghcr.io/${{ secrets.REGISTRY_USERNAME }}/${{ secrets.API_IMAGE_NAME }}
-          docker push ghcr.io/${{ secrets.REGISTRY_USERNAME }}/${{ secrets.NGINX_IMAGE }}
+          docker push ${{ secrets.REGISTRY_HOST }}/${{ secrets.REGISTRY_USERNAME }}/${{ secrets.API_IMAGE_NAME }}
+          docker push ${{ secrets.REGISTRY_HOST }}/${{ secrets.REGISTRY_USERNAME }}/${{ secrets.NGINX_IMAGE }}
