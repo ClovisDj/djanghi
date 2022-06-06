@@ -126,7 +126,7 @@ WSGI_APPLICATION = 'apps.wsgi.application'
 
 DATABASES = {
     'default': ENV.db(
-        default=f"{ENV('POSTGRES_HOST')}:"
+        default=f"psql:"
                 f"//{ENV('POSTGRES_USER')}:"
                 f"{ENV('POSTGRES_PASSWORD')}@"
                 f"{ENV('POSTGRES_HOST')}:"
