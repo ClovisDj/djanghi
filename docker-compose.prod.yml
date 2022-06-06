@@ -4,7 +4,7 @@ services:
   djanghi-api:
     build:
       context: .
-    image: djanghi/prod
+    image: ${REGISTRY_HOST}/${REGISTRY_USERNAME}/${API_IMAGE_NAME}
     command: gunicorn apps.wsgi:application --bind 0.0.0.0:8070 -w 4 -t 60
     volumes:
       - static_volume:/var/djanghi/static
@@ -15,7 +15,7 @@ services:
 
   nginx:
     build: ./nginx
-    image: djanghi/nginx
+    image: ${REGISTRY_HOST}/${REGISTRY_USERNAME}/${NGINX_IMAGE}
     volumes:
       - static_volume:/var/djanghi/static
     ports:
