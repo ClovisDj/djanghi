@@ -79,16 +79,38 @@ jobs:
           envkey_NGINX_IMAGE: ${{ secrets.NGINX_IMAGE }}
           file_name: .env
           fail_on_empty: true
-      - name: Login to GitHub Container Registry
+      - name: Login to Container Registry
         uses: docker/login-action@v2
         with:
-          registry: ghcr.io
+          registry: ${{ secrets.REGISTRY_HOST }}
           username: ${{ github.actor }}
           password: ${{ secrets.PACKAGE_ACCESS_TOKEN }}
       - name: Build images
         run: |
           docker-compose -f docker-compose.prod.yml build
-      - name: push images to github packages
+      - name: push images to package registry
         run: |
           docker push ${{ secrets.REGISTRY_HOST }}/${{ secrets.REGISTRY_USERNAME }}/${{ secrets.API_IMAGE_NAME }}
           docker push ${{ secrets.REGISTRY_HOST }}/${{ secrets.REGISTRY_USERNAME }}/${{ secrets.NGINX_IMAGE }}
+
+      - name: Add the private SSH key to the ssh-agent
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: |
+          mkdir -p ~/.ssh
+          ssh-agent -a $SSH_AUTH_SOCK > /dev/null
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
+          ssh-add - <<< "${{ secrets.SSH_KEY }}"
+      - name: Build and deploy images
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: |
+          scp  -o StrictHostKeyChecking=no -r ./.env ./docker-compose.prod.yml root@${{ secrets.PROD_HOST_IP }}:/app
+          ssh -o StrictHostKeyChecking=no root@${{ secrets.PROD_HOST_IP }} << 'ENDSSH'
+            cd /app
+            source .env
+            docker login ${{ secrets.REGISTRY_HOST }} -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.PACKAGE_ACCESS_TOKEN }}
+            docker pull ${{ secrets.REGISTRY_HOST }}/${{ secrets.REGISTRY_USERNAME }}/${{ secrets.API_IMAGE_NAME }}
+            docker pull ${{ secrets.REGISTRY_HOST }}/${{ secrets.REGISTRY_USERNAME }}/${{ secrets.NGINX_IMAGE }}
+            docker-compose -f docker-compose.prod.yml up -d
+          ENDSSH
