@@ -75,10 +75,12 @@ jobs:
           envkey_CORS_ALLOWED_ORIGINS: ${{ secrets.CORS_ALLOWED_ORIGINS }}
           file_name: .env
           fail_on_empty: true
-      - name: Log in to GitHub Packages
-        run: echo ${PACKAGE_ACCESS_TOKEN} | docker login ghcr.io -u ${{ secrets.NAMESPACE }} --password-stdin
-        env:
-          PACKAGE_ACCESS_TOKEN: ${{ secrets.PACKAGE_ACCESS_TOKEN }}
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.PACKAGE_ACCESS_TOKEN }}
       - name: Build images
         run: |
           docker-compose -f docker-compose.prod.yml build
