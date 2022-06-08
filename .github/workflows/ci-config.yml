@@ -98,7 +98,7 @@ jobs:
         with:
           host: ${{ secrets.PROD_HOST_IP }}
           USERNAME: ${{ secrets.SSH_USER }}
-          KEY: ${{ secrets.SSHKEY }}
+          KEY: ${{ secrets.SSH_KEY }}
           script: |
             docker login ${{ secrets.REGISTRY_HOST }} -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.PACKAGE_ACCESS_TOKEN }}
             docker pull ${{ secrets.REGISTRY_HOST }}/${{ secrets.REGISTRY_USERNAME }}/${{ secrets.API_IMAGE_NAME }}
