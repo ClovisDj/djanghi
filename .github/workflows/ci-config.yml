@@ -93,24 +93,14 @@ jobs:
           docker push ${{ secrets.REGISTRY_HOST }}/${{ secrets.REGISTRY_USERNAME }}/${{ secrets.API_IMAGE_NAME }}
           docker push ${{ secrets.REGISTRY_HOST }}/${{ secrets.REGISTRY_USERNAME }}/${{ secrets.NGINX_IMAGE }}
 
-      - name: Add the private SSH key to the ssh-agent
-        env:
-          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-        run: |
-          mkdir -p ~/.ssh
-          ssh-agent -a $SSH_AUTH_SOCK > /dev/null
-          ssh-keyscan github.com >> ~/.ssh/known_hosts
-          ssh-add - <<< "${{ secrets.SSH_KEY }}"
-      - name: Build and deploy images
-        env:
-          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-        run: |
-          scp  -o StrictHostKeyChecking=no -r ./.env ./docker-compose.prod.yml root@${{ secrets.PROD_HOST_IP }}:/app
-          ssh -o StrictHostKeyChecking=no root@${{ secrets.PROD_HOST_IP }} << 'ENDSSH'
-            cd /app
-            source .env
+      - name: server ssh and run images
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.PROD_HOST_IP }}
+          USERNAME: ${{ secrets.SSH_USER }}
+          KEY: ${{ secrets.SSHKEY }}
+          script: |
             docker login ${{ secrets.REGISTRY_HOST }} -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.PACKAGE_ACCESS_TOKEN }}
             docker pull ${{ secrets.REGISTRY_HOST }}/${{ secrets.REGISTRY_USERNAME }}/${{ secrets.API_IMAGE_NAME }}
             docker pull ${{ secrets.REGISTRY_HOST }}/${{ secrets.REGISTRY_USERNAME }}/${{ secrets.NGINX_IMAGE }}
             docker-compose -f docker-compose.prod.yml up -d
-          ENDSSH
