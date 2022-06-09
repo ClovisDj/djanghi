@@ -5,6 +5,7 @@ services:
     build:
       context: .
     image: ${REGISTRY_HOST}/${REGISTRY_USERNAME}/${API_IMAGE_NAME}
+    restart: unless-stopped
     command: gunicorn apps.wsgi:application --bind 0.0.0.0:8070 -w 4 -t 60
     volumes:
       - static_volume:/var/djanghi/static
@@ -25,9 +26,23 @@ services:
     networks:
       - djanghi-network
 
-networks:
-  djanghi-network:
-    name: djanghi-network
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
+    volumes:
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+      - web-root:/var/djanghi/static
+    depends_on:
+      - nginx
+    command: certonly --webroot --webroot-path=/var/djanghi/static --email ${MAINTAINER_EMAIL} --agree-tos --no-eff-email --staging -d ${API_HOST}  -d www.${API_HOST}
 
 volumes:
   static_volume:
+  certbot-etc:
+  certbot-var:
+  web-root:
+
+networks:
+  djanghi-network:
+    name: djanghi-network

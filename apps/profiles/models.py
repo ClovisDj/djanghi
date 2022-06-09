@@ -252,7 +252,8 @@ class UserRegistrationLink(CreateUpdateDateMixin, UUIDModelMixin, models.Model):
         ordering = ['-updated_at']
 
     def save(self, *args, **kwargs):
-        self.link = f'{settings.API_HOST}/activate/{str(self.association_id)}/{str(self.user_id)}/{str(self.id)}'
+        schema = 'http://' if settings.ENVIRONMENT.lower() == 'local' else 'https://'
+        self.link = f'{schema}{settings.API_HOST}/activate/{str(self.association_id)}/{str(self.user_id)}/{str(self.id)}'
 
         return super().save(*args, **kwargs)
 
