@@ -122,4 +122,4 @@ jobs:
             docker pull ${{ secrets.REGISTRY_HOST }}/${{ secrets.REGISTRY_USERNAME }}/${{ secrets.API_IMAGE_NAME }}
             docker pull ${{ secrets.REGISTRY_HOST }}/${{ secrets.REGISTRY_USERNAME }}/${{ secrets.NGINX_IMAGE }}
             docker-compose -f docker-compose.prod.yml up -d
-            docker exec -it ${{ secrets.API_CONTAINER }} ./manage.py migrate
+            docker run -i ${{ secrets.REGISTRY_HOST }}/${{ secrets.REGISTRY_USERNAME }}/${{ secrets.API_IMAGE_NAME }} ./manage.py migrate
