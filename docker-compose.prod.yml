@@ -17,6 +17,7 @@ services:
   nginx:
     build: ./nginx
     image: ${REGISTRY_HOST}/${REGISTRY_USERNAME}/${NGINX_IMAGE}
+    restart: unless-stopped
     volumes:
       - static_volume:/var/djanghi/static
       - certbot-etc:/etc/letsencrypt
