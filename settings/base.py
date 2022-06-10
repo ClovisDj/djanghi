@@ -181,9 +181,10 @@ GEOS_LIBRARY_PATH = glob('/usr/lib/libgeos_c.so.*')[0]
 DEFAULT_REGISTRATION_LINK_LIFE = 10     # 10 Days
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-SECURE_SSL_REDIRECT = True
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
+if ENVIRONMENT.lower() != 'local':
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
 
 AUTH_USER_MODEL = 'profiles.User'
 AUTHENTICATION_BACKENDS = ['apps.extensions.backend.DjanghiModelBackend']
