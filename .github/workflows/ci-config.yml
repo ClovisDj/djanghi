@@ -109,7 +109,7 @@ jobs:
           USERNAME: ${{ secrets.SSH_USER }}
           KEY: ${{ secrets.SSH_KEY }}
           source: "nginx/*"
-          target: "app/nginx"
+          target: "app"
 
       - name: server ssh and run images
         uses: appleboy/ssh-action@master
