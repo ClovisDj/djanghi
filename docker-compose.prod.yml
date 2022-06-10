@@ -39,7 +39,7 @@ services:
       - web-root:/var/www/html
     depends_on:
       - nginx
-    command: certonly --webroot --webroot-path=/var/www/html --email ${MAINTAINER_EMAIL} --agree-tos --no-eff-email --staging -d ${API_HOST}  -d www.${API_HOST}
+    command: certonly --webroot --webroot-path=/var/www/html --email ${MAINTAINER_EMAIL} --agree-tos --no-eff-email --force-renewal -d ${API_HOST}  -d www.${API_HOST}
 
 volumes:
   static_volume:
