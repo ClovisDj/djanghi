@@ -25,6 +25,7 @@ services:
       - web-root:/var/www/html
     ports:
       - "80:80"
+      - "443:443"
     depends_on:
       - djanghi-api
     networks:
