@@ -48,6 +48,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: prod
     needs: tests
+    if: github.ref == 'refs/heads/master'
     steps:
       - uses: actions/checkout@v2
       - name: Make and populate .env file
