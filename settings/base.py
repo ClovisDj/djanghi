@@ -188,4 +188,6 @@ SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 #     CSRF_COOKIE_SECURE = True
 
 AUTH_USER_MODEL = 'profiles.User'
-AUTHENTICATION_BACKENDS = ['apps.extensions.backend.DjanghiModelBackend', 'django.contrib.auth.backends.ModelBackend']
+AUTHENTICATION_BACKENDS = ['apps.extensions.backend.DjanghiModelBackend']
+if ENVIRONMENT.lower() == 'prod':
+    AUTHENTICATION_BACKENDS.append('django.contrib.auth.backends.ModelBackend')
