@@ -89,7 +89,7 @@ jobs:
           password: ${{ secrets.PACKAGE_ACCESS_TOKEN }}
       - name: Build images
         run: |
-          docker-compose -f docker-compose.prod.yml build
+          docker-compose -f docker-compose.prod.yml build djanghi-api nginx
       - name: push images to package registry
         run: |
           docker push ${{ secrets.REGISTRY_HOST }}/${{ secrets.REGISTRY_USERNAME }}/${{ secrets.API_IMAGE_NAME }}
@@ -123,5 +123,6 @@ jobs:
             docker login ${{ secrets.REGISTRY_HOST }} -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.PACKAGE_ACCESS_TOKEN }}
             docker pull ${{ secrets.REGISTRY_HOST }}/${{ secrets.REGISTRY_USERNAME }}/${{ secrets.API_IMAGE_NAME }}
             docker pull ${{ secrets.REGISTRY_HOST }}/${{ secrets.REGISTRY_USERNAME }}/${{ secrets.NGINX_IMAGE }}
+            docker pull ${{ secrets.REGISTRY_HOST }}/${{ secrets.REGISTRY_USERNAME }}/${{ secrets.UI_IMAGE_NAME }}
             docker-compose -f docker-compose.prod.yml up -d
             docker run -i ${{ secrets.REGISTRY_HOST }}/${{ secrets.REGISTRY_USERNAME }}/${{ secrets.API_IMAGE_NAME }} ./manage.py migrate
