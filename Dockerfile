@@ -36,3 +36,15 @@ COPY . /app/
 FROM build as local
 RUN chmod -R 777 /root/  ## Grant all local users access to poetry
 RUN apk add gdb
+
+## Image only used for production building ##
+## ======================================= ##
+FROM build AS prod
+
+COPY . /app/
+RUN \[ -d "$VIRTUAL_ENV" \] || virtualenv "$VIRTUAL_ENV"
+RUN . "$VIRTUAL_ENV/bin/activate" && poetry install --no-dev
+
+# Generate static assets
+RUN python manage.py collectstatic -c --noinput
+COPY . .

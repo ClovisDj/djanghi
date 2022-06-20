@@ -138,7 +138,7 @@ class UserRegistrationView(View):
             activated_user = form.activate_user(self.registration_link.user, form.cleaned_data)
             form.deactivate_link(self.registration_link)
             login_data = _force_login(activated_user)
-            redirect_url = f'{settings.FRONT_END_HOST}?refresh={login_data[0]}&access={login_data[1]}'
+            redirect_url = f'{settings.FRONT_END_HOST}/activated?refresh={login_data[0]}&access={login_data[1]}'
             return HttpResponseRedirect(redirect_url)
 
         error_message = []

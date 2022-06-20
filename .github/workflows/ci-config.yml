@@ -1,0 +1,130 @@
+name: Djanghi Pipeline
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  tests:
+    name: Build and run pytest
+    runs-on: ubuntu-latest
+    environment: CI Tests
+    steps:
+      - uses: actions/checkout@v2
+      - name: Make and populate .env file
+        uses: SpicyPizza/create-envfile@v1.3
+        with:
+          envkey_DEBUG: ${{ secrets.DEBUG }}
+          envkey_ENVIRONMENT: ${{ secrets.ENVIRONMENT }}
+          envkey_SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          envkey_ALLOWED_HOSTS: ${{ secrets.ALLOWED_HOSTS }}
+          envkey_API_HOST: ${{ secrets.API_HOST }}
+          envkey_DJANGO_LOG_LEVEL: ${{ secrets.DJANGO_LOG_LEVEL }}
+          envkey_FRONT_END_HOST: ${{ secrets.FRONT_END_HOST }}
+          envkey_POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          envkey_POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          envkey_POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
+          envkey_POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+          envkey_DB_PORT: ${{ secrets.DB_PORT }}
+          envkey_ACCESS_TOKEN_LIFETIME: ${{ secrets.ACCESS_TOKEN_LIFETIME }}
+          envkey_REFRESH_TOKEN_LIFETIME: ${{ secrets.ACCESS_TOKEN_LIFETIME }}
+          envkey_JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
+          envkey_AUTH_HEADER_TYPES: ${{ secrets.AUTH_HEADER_TYPES }}
+          envkey_PAGE_SIZE: ${{ secrets.PAGE_SIZE }}
+          envkey_SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
+          envkey_DEFAULT_FROM_EMAIL: ${{ secrets.DEFAULT_FROM_EMAIL }}
+          envkey_CORS_ALLOWED_ORIGINS: ${{ secrets.CORS_ALLOWED_ORIGINS }}
+          file_name: .env
+          fail_on_empty: true
+      - name: Build images
+        run: make build
+      - name: Run Tests
+        run: make CI-pytest
+
+  deploy:
+    name: Build and deploy images
+    runs-on: ubuntu-latest
+    environment: prod
+    needs: tests
+    if: github.ref == 'refs/heads/master'
+    steps:
+      - uses: actions/checkout@v2
+      - name: Make and populate .env file
+        uses: SpicyPizza/create-envfile@v1.3
+        with:
+          envkey_DEBUG: ${{ secrets.DEBUG }}
+          envkey_ENVIRONMENT: ${{ secrets.ENVIRONMENT }}
+          envkey_SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          envkey_ALLOWED_HOSTS: ${{ secrets.ALLOWED_HOSTS }}
+          envkey_API_HOST: ${{ secrets.API_HOST }}
+          envkey_DJANGO_LOG_LEVEL: ${{ secrets.DJANGO_LOG_LEVEL }}
+          envkey_FRONT_END_HOST: ${{ secrets.FRONT_END_HOST }}
+          envkey_POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          envkey_POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          envkey_POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
+          envkey_POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+          envkey_DB_PORT: ${{ secrets.DB_PORT }}
+          envkey_ACCESS_TOKEN_LIFETIME: ${{ secrets.ACCESS_TOKEN_LIFETIME }}
+          envkey_REFRESH_TOKEN_LIFETIME: ${{ secrets.ACCESS_TOKEN_LIFETIME }}
+          envkey_JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
+          envkey_AUTH_HEADER_TYPES: ${{ secrets.AUTH_HEADER_TYPES }}
+          envkey_PAGE_SIZE: ${{ secrets.PAGE_SIZE }}
+          envkey_SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
+          envkey_DEFAULT_FROM_EMAIL: ${{ secrets.DEFAULT_FROM_EMAIL }}
+          envkey_CORS_ALLOWED_ORIGINS: ${{ secrets.CORS_ALLOWED_ORIGINS }}
+          envkey_REGISTRY_HOST: ${{ secrets.REGISTRY_HOST }}
+          envkey_REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
+          envkey_API_IMAGE_NAME: ${{ secrets.API_IMAGE_NAME }}
+          envkey_UI_IMAGE_NAME: ${{ secrets.UI_IMAGE_NAME }}
+          envkey_NGINX_IMAGE: ${{ secrets.NGINX_IMAGE }}
+          envkey_MAINTAINER_EMAIL: ${{ secrets.MAINTAINER_EMAIL }}
+          file_name: .env
+          fail_on_empty: true
+      - name: Login to Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ secrets.REGISTRY_HOST }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.PACKAGE_ACCESS_TOKEN }}
+      - name: Build images
+        run: |
+          docker-compose -f docker-compose.prod.yml build djanghi-api nginx
+      - name: push images to package registry
+        run: |
+          docker push ${{ secrets.REGISTRY_HOST }}/${{ secrets.REGISTRY_USERNAME }}/${{ secrets.API_IMAGE_NAME }}
+          docker push ${{ secrets.REGISTRY_HOST }}/${{ secrets.REGISTRY_USERNAME }}/${{ secrets.NGINX_IMAGE }}
+
+      - name: copy compose file to server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.PROD_HOST_IP }}
+          USERNAME: ${{ secrets.SSH_USER }}
+          KEY: ${{ secrets.SSH_KEY }}
+          source: "docker-compose.prod.yml,.env"
+          target: "app"
+      - name: copy nginx folder
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.PROD_HOST_IP }}
+          USERNAME: ${{ secrets.SSH_USER }}
+          KEY: ${{ secrets.SSH_KEY }}
+          source: "nginx/*"
+          target: "app"
+
+      - name: server ssh and run images
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.PROD_HOST_IP }}
+          USERNAME: ${{ secrets.SSH_USER }}
+          KEY: ${{ secrets.SSH_KEY }}
+          script: |
+            cd app/
+            docker rmi $(docker images -a -q)
+            docker login ${{ secrets.REGISTRY_HOST }} -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.PACKAGE_ACCESS_TOKEN }}
+            docker pull ${{ secrets.REGISTRY_HOST }}/${{ secrets.REGISTRY_USERNAME }}/${{ secrets.API_IMAGE_NAME }}
+            docker pull ${{ secrets.REGISTRY_HOST }}/${{ secrets.REGISTRY_USERNAME }}/${{ secrets.NGINX_IMAGE }}
+            docker pull ${{ secrets.REGISTRY_HOST }}/${{ secrets.REGISTRY_USERNAME }}/${{ secrets.UI_IMAGE_NAME }}
+            docker-compose -f docker-compose.prod.yml up -d
+            docker run -i ${{ secrets.REGISTRY_HOST }}/${{ secrets.REGISTRY_USERNAME }}/${{ secrets.API_IMAGE_NAME }} ./manage.py migrate

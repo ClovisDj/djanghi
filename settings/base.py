@@ -126,7 +126,7 @@ WSGI_APPLICATION = 'apps.wsgi.application'
 
 DATABASES = {
     'default': ENV.db(
-        default=f"{ENV('POSTGRES_HOST')}:"
+        default=f"psql:"
                 f"//{ENV('POSTGRES_USER')}:"
                 f"{ENV('POSTGRES_PASSWORD')}@"
                 f"{ENV('POSTGRES_HOST')}:"
@@ -181,6 +181,13 @@ GEOS_LIBRARY_PATH = glob('/usr/lib/libgeos_c.so.*')[0]
 DEFAULT_REGISTRATION_LINK_LIFE = 10     # 10 Days
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+# if ENVIRONMENT.lower() == 'prod':
+#     PREPEND_WWW = True
+#     SECURE_SSL_REDIRECT = True
+#     SESSION_COOKIE_SECURE = True
+#     CSRF_COOKIE_SECURE = True
 
 AUTH_USER_MODEL = 'profiles.User'
 AUTHENTICATION_BACKENDS = ['apps.extensions.backend.DjanghiModelBackend']
+if ENVIRONMENT.lower() == 'prod':
+    AUTHENTICATION_BACKENDS.append('django.contrib.auth.backends.ModelBackend')

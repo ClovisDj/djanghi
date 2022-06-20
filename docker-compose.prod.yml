@@ -1,0 +1,64 @@
+version: '3.9'
+
+services:
+  djanghi-api:
+    build:
+      context: .
+    image: ${REGISTRY_HOST}/${REGISTRY_USERNAME}/${API_IMAGE_NAME}
+    restart: unless-stopped
+    command: gunicorn apps.wsgi:application --bind 0.0.0.0:8070 -w 4 -t 60
+    volumes:
+      - static_volume:/var/djanghi/static
+    expose:
+      - "8070"
+    networks:
+      - djanghi-network
+
+  djanghi-ui:
+    image: ${REGISTRY_HOST}/${REGISTRY_USERNAME}/${UI_IMAGE_NAME}
+    restart: unless-stopped
+    volumes:
+      - ui-build:/src/build
+    networks:
+      - djanghi-network
+
+  nginx:
+    build: ./nginx
+    image: ${REGISTRY_HOST}/${REGISTRY_USERNAME}/${NGINX_IMAGE}
+    restart: unless-stopped
+    volumes:
+      - static_volume:/var/djanghi/static
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+      - web-root:/var/www/html
+      - ui-build:/usr/share/nginx/html/build
+    ports:
+      - "80:80"
+      - "443:443"
+    command: ["nginx", "-g", "daemon off;"]
+    depends_on:
+      - djanghi-api
+    networks:
+      - djanghi-network
+
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
+    volumes:
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+      - web-root:/var/www/html
+    depends_on:
+      - nginx
+    command: certonly --webroot --webroot-path=/var/www/html --email ${MAINTAINER_EMAIL} --agree-tos --no-eff-email --force-renewal -d ${API_HOST} -d www.${API_HOST} -d djanghi.com -d www.djanghi.com
+
+volumes:
+  static_volume:
+  certbot-etc:
+  certbot-var:
+  web-root:
+  ui-build:
+
+networks:
+  djanghi-network:
+    name: djanghi-network

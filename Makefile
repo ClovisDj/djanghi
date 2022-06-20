@@ -5,6 +5,9 @@ user-shell := docker-compose run --rm -e LOCAL_USER_ID=`id -u $$USER` -e LOCAL_G
 build:
 	docker-compose build
 
+build-CI:
+	docker-compose -f docker-compose.yml build --no-cache
+
 poetry:
 	$(user-shell) sh -c "virtualenv .virtualenv && source .virtualenv/bin/activate && poetry $(O)"
 
@@ -40,6 +43,11 @@ down:
 n := 2
 # Ex: make pytest n=6
 pytest:
+	$(user-shell) bash -c "pytest -n $(n) --cov=apps --cov-report=term"
+
+CI-pytest:
+	docker network create djanghi-portal || true
+	$(MAKE) poetry-install
 	$(user-shell) bash -c "pytest -n $(n) --cov=apps --cov-report=term"
 
 # Use caution with the below command since it will wipe out your local postgres db
