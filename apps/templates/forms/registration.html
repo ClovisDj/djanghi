@@ -1,0 +1,73 @@
+{% extends "forms/base.html" %}
+{% load static %}
+
+{% block title %}
+  <title>Registration</title>
+{% endblock %}
+
+{% block body %}
+    <section class="section register min-vh-100 d-flex flex-column align-items-center justify-content-center py-4">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-4 col-md-6 d-flex flex-column align-items-center justify-content-center">
+                    <div class="d-flex justify-content-center py-4">
+                        <a href="http://djanghi.com" class="logo d-flex align-items-center w-auto" target="_blank">
+                          <img src="{% static 'images/logo.png' %}" alt="">
+                          <span class="">Djanghi</span>
+                        </a>
+                    </div>
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="pt-4 pb-2">
+                                <h5 class="card-title text-center pb-0 fs-4">{{ association.label|title }} - Registration</h5>
+                            </div>
+
+                            <form class="row g-3 needs-validation" method="POST">
+                                {% csrf_token %}
+                                <div class="col-12 spacer">
+                                    {{ form.first_name }}
+                                </div>
+
+                                <div class="col-12 spacer">
+                                    {{ form.last_name }}
+                                </div>
+
+                                <div class="col-12 spacer">
+                                  {{ form.password }}
+                                </div>
+
+                                <div class="col-12 spacer">
+                                 {{ form.password_verification }}
+                                </div>
+
+                                <div class="col-12">
+                                  <button class="btn btn-primary w-100" type="submit">Create Account</button>
+                                </div>
+                                <div class="col-12">
+                                  <p class="small mb-0">Already have an account? <a href="http://djanghi.com">Log in</a></p>
+                                </div>
+
+                                <div class="col-12 spacer">
+                                    {% if errors %}
+                                      {% for error_message  in errors %}
+                                          <span style="color:#c41111">{{ error_message|upper }}</span>
+                                      {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </form>
+
+                        </div>
+                    </div>
+                    <div class="credits">
+                        <div class="copyright">
+                            <a href="http://djanghi.com" class="d-flex align-items-center w-auto" target="_blank">
+                                Copyright &copy; {{ year }}<strong><span>&nbsp;Djanghi</span></strong>.
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+      </section>
+{% endblock %}

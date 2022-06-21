@@ -17,7 +17,7 @@ class Association(CreateUpdateDateMixin, UUIDModelMixin, models.Model):
     address = models.CharField(max_length=200, null=True, blank=True)
 
     # Settings
-    email_from = models.EmailField(null=False, unique=True)
+    email_from = models.EmailField(null=False, default=settings.DEFAULT_FROM_EMAIL)
     registration_link_life = models.IntegerField(default=settings.DEFAULT_REGISTRATION_LINK_LIFE)
     is_active = models.BooleanField(default=True)
 
