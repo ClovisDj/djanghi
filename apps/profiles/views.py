@@ -79,7 +79,7 @@ class UserRegistrationViewSet(mixins.CreateModelMixin,
 
 
 class UserRegistrationView(View):
-    template_name = 'user_registration/registration_form.html'
+    template_name = 'forms/registration.html'
     form_class = UserRegistrationForm
 
     def __init__(self, *args, **kwargs):
