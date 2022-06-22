@@ -126,5 +126,7 @@ jobs:
             docker pull ${{ secrets.REGISTRY_HOST }}/${{ secrets.REGISTRY_USERNAME }}/${{ secrets.API_IMAGE_NAME }}
             docker pull ${{ secrets.REGISTRY_HOST }}/${{ secrets.REGISTRY_USERNAME }}/${{ secrets.NGINX_IMAGE }}
             docker pull ${{ secrets.REGISTRY_HOST }}/${{ secrets.REGISTRY_USERNAME }}/${{ secrets.UI_IMAGE_NAME }}
-            docker-compose -f docker-compose.prod.yml up -d
+            docker-compose -f docker-compose.prod.yml down
+            docker volume rm app_static_volume
+            docker-compose -f docker-compose.prod.yml up -d djanghi-api djanghi-ui nginx
             docker run -i ${{ secrets.REGISTRY_HOST }}/${{ secrets.REGISTRY_USERNAME }}/${{ secrets.API_IMAGE_NAME }} ./manage.py migrate
