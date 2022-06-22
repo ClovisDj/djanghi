@@ -94,3 +94,12 @@ class TestUserLoginView(ActMixin):
         assert response_data['association'] == str(association_abc.id)
         assert 'access' in response_data
         assert 'refresh' in response_data
+
+    def test_registered_user_cannot_login_in_another_association_with_his_credentials(self, base_client, user_alice,
+                                                                                      association_abc, association_xyz):
+        response = base_client.post(self.login_url, {
+            'email': user_alice.email,
+            'password': 'Password123',
+            'association': association_xyz.label
+        })
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
