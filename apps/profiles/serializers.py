@@ -1,6 +1,5 @@
 import datetime
 
-from django.contrib.auth import authenticate
 from django.contrib.auth.models import update_last_login
 from django import forms
 from django.utils import timezone
@@ -12,6 +11,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import User, UserRegistrationLink, UserRole
 from ..associations.serializers import AssociationModelSerializer
+from ..extensions.backend import DjanghiModelBackend
 
 
 class LoginSerializer(TokenObtainSerializer):
@@ -39,7 +39,7 @@ class LoginSerializer(TokenObtainSerializer):
         except KeyError:
             pass
 
-        self.user = authenticate(**authenticate_kwargs)
+        self.user = DjanghiModelBackend().authenticate(**authenticate_kwargs)
 
         if not api_settings.USER_AUTHENTICATION_RULE(self.user):
             raise exceptions.AuthenticationFailed(
