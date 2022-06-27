@@ -90,6 +90,7 @@ class User(AbstractUser):
     country_of_birth = models.CharField(max_length=100, null=True, blank=True)
     sex = models.CharField(max_length=2, choices=SEX_CHOICES, default=UNSPECIFIED)
     address = models.CharField(max_length=300, null=True, blank=True)
+    notify_on_payment = models.BooleanField(default=True)
 
     groups = models.ManyToManyField(
         CustomGroup,

@@ -20,6 +20,7 @@ class Association(CreateUpdateDateMixin, UUIDModelMixin, models.Model):
     email_from = models.EmailField(null=False, default=settings.DEFAULT_FROM_EMAIL)
     registration_link_life = models.IntegerField(default=settings.DEFAULT_REGISTRATION_LINK_LIFE)
     is_active = models.BooleanField(default=True)
+    notify_user_payments = models.BooleanField(default=True)
 
     last_updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
