@@ -40,7 +40,7 @@ migrate:
 down:
 	docker-compose down
 
-n := 2
+n := $$(nproc --all)
 # Ex: make pytest n=6
 pytest:
 	$(user-shell) bash -c "pytest -n $(n) --cov=apps --cov-report=term"
