@@ -141,6 +141,16 @@ class User(AbstractUser):
                 {'sex': f'{self.sex} is not a valid choice'}
             )
 
+    @property
+    def can_receive_payment_notification(self):
+        return (
+            self.is_active and
+            self.is_registered and
+            self.notify_on_payment and
+            self.association.is_active and
+            self.association.notify_user_payments
+        )
+
     def clean(self):
         super().clean()
 
