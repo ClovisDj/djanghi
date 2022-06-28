@@ -1,3 +1,4 @@
+from django.core import mail
 from django.urls import reverse
 from rest_framework import status
 
@@ -178,3 +179,107 @@ class TestMembershipPaymentsViewSet(ActMixin):
             relationships = payment['relationships']
             assert relationships['association']['data']['id'] == str(abc_user.association_id)
             assert relationships['user']['data']['id'] == str(abc_user.id)
+
+    def test_an_inactive_user_cannot_receive_payment_notification(self, authenticated_alice_user_client, abc_user,
+                                                                  alice_full_admin, abc_payments_type):
+        abc_user.is_active = False
+        abc_user.save()
+
+        self.act(
+            self.get_list_url(abc_user),
+            authenticated_alice_user_client,
+            data={
+                'amount': 10.5,
+                'membership_payment_type_id': str(abc_payments_type[1].id)
+            },
+            method='post',
+            status_code=status.HTTP_201_CREATED
+        )
+        assert len(mail.outbox) == 0
+
+    def test_a_non_registered_user_cannot_receive_payment_notification(self, authenticated_alice_user_client, abc_user,
+                                                                       alice_full_admin, abc_payments_type):
+        abc_user.is_registered = False
+        abc_user.save()
+
+        self.act(
+            self.get_list_url(abc_user),
+            authenticated_alice_user_client,
+            data={
+                'amount': 10.5,
+                'membership_payment_type_id': str(abc_payments_type[1].id)
+            },
+            method='post',
+            status_code=status.HTTP_201_CREATED
+        )
+        assert len(mail.outbox) == 0
+
+    def test_a_user_cannot_receive_a_payment_notification_if_opted_out(self, authenticated_alice_user_client, abc_user,
+                                                                       alice_full_admin, abc_payments_type):
+        abc_user.notify_on_payment = False
+        abc_user.save()
+
+        self.act(
+            self.get_list_url(abc_user),
+            authenticated_alice_user_client,
+            data={
+                'amount': 10.5,
+                'membership_payment_type_id': str(abc_payments_type[1].id)
+            },
+            method='post',
+            status_code=status.HTTP_201_CREATED
+        )
+        assert len(mail.outbox) == 0
+
+    def test_a_user_cannot_receive_a_payment_notification_if_association_opted_out(self, authenticated_alice_user_client,
+                                                                                   abc_user, alice_full_admin,
+                                                                                   abc_payments_type):
+        abc_user.association.notify_user_payments = False
+        abc_user.association.save()
+
+        self.act(
+            self.get_list_url(abc_user),
+            authenticated_alice_user_client,
+            data={
+                'amount': 10.5,
+                'membership_payment_type_id': str(abc_payments_type[1].id)
+            },
+            method='post',
+            status_code=status.HTTP_201_CREATED
+        )
+        assert len(mail.outbox) == 0
+
+    def test_a_user_cannot_receive_a_payment_notification_if_association_is_deactivated(self,
+                                                                                        authenticated_alice_user_client,
+                                                                                        abc_user, alice_full_admin,
+                                                                                        abc_payments_type):
+        abc_user.association.is_active = False
+        abc_user.association.save()
+
+        self.act(
+            self.get_list_url(abc_user),
+            authenticated_alice_user_client,
+            data={
+                'amount': 10.5,
+                'membership_payment_type_id': str(abc_payments_type[1].id)
+            },
+            method='post',
+            status_code=status.HTTP_201_CREATED
+        )
+        assert len(mail.outbox) == 0
+
+    def test_a_registered_user_with_no_opt_out_should_receive_notification_payment_message(self,
+                                                                                           authenticated_alice_user_client,
+                                                                                           abc_user, alice_full_admin,
+                                                                                           abc_payments_type):
+        self.act(
+            self.get_list_url(abc_user),
+            authenticated_alice_user_client,
+            data={
+                'amount': 10.5,
+                'membership_payment_type_id': str(abc_payments_type[1].id)
+            },
+            method='post',
+            status_code=status.HTTP_201_CREATED
+        )
+        assert len(mail.outbox) == 1

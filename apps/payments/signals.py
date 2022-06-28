@@ -19,7 +19,8 @@ def update_membership_payments_status(sender, instance, created, **kwargs):
         status_object.current_value += round(instance.amount, 2)
 
         required_amount = status_object.membership_payment_type.required_amount
-        if required_amount and required_amount > 0 and status_object.current_value > 0:
+        required_amount = required_amount if required_amount is not None else 0
+        if required_amount > 0 and status_object.current_value > 0:
             status_object.paid_percentage = round((status_object.current_value / required_amount) * 100, 2)
 
         if status_object.current_value < 0:
