@@ -39,8 +39,11 @@ def update_membership_payments_status(sender, instance, created, **kwargs):
                 "contrib_field": instance.membership_payment_type.name,
                 "required_amount": required_amount,
                 "total_paid": status_object.current_value,
-                "unpaid": required_amount - status_object.current_value,
+                "unpaid": 0,
             }
+            if required_amount > status_object.current_value:
+                context['unpaid'] = required_amount - status_object.current_value
+
             if instance.payment_type == MembershipPayment.COST:
                 context['background_color'] = "rgb(253,82,116)"
                 context['payment_type'] = "Debit"
