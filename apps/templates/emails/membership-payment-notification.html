@@ -1,0 +1,140 @@
+{% extends "emails/base.html" %}
+
+{% block title %}
+ <title>Payment Notification</title>
+{% endblock %}
+
+
+{% block body %}
+<!--[if mso | IE]></td></tr></table><table align="center" border="0" cellpadding="0" cellspacing="0" class="" style="width:600px;" width="600" bgcolor="#FFFFFF" ><tr><td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;"><![endif]-->
+<div style="background:#FFFFFF;background-color:#FFFFFF;margin:0px auto;max-width:600px;">
+  <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background:#FFFFFF;background-color:#FFFFFF;width:100%;">
+    <tbody>
+      <tr>
+        <td style="direction:ltr;font-size:0px;padding:20px 20px 0 20px;text-align:center;">
+          <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td class="" style="vertical-align:top;width:560px;" ><![endif]-->
+          <div class="mj-column-per-100 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;">
+            <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%">
+              <tbody>
+                <tr>
+                  <td align="left" style="font-size:0px;padding:30px 4px 10px 4px;word-break:break-word;">
+                    <div style="font-family:Montserrat, Helvetica, Arial, sans-serif;font-size:16px;font-weight:300;line-height:40x;text-align:left;color:#666666;">
+                        Hi {{ first_name | title }},
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td align="left" style="font-size:0px;padding:10px 4px 10px 4px;word-break:break-word;">
+                      <div style="font-family:Montserrat, Helvetica, Arial, sans-serif;font-size:16px;font-weight:300;line-height:40x;text-align:left;color:#666666;">
+                          Your <strong>{{ association_label | title }} - {{ contrib_field | title }}</strong> account just received the below payment.
+                      </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td align="left" style="font-size:0px;padding:10px 4px 20px 4px;word-break:break-word;">
+                    <div class="mj-column-per-100 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;">
+                        <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%">
+                          <tbody>
+                            <tr>
+                              <td align="left" style="font-size:0px;padding:10px;word-break:break-word;">
+                                <table cellpadding="0" cellspacing="0" width="100%" border="0" style="color:#000000;font-family:Ubuntu, Helvetica, Arial, sans-serif;font-size:13px;line-height:22px;table-layout:auto;width:100%;border:none;">
+                                  <tr style="font-family:Montserrat, Helvetica, Arial, sans-serif;font-size:16px;font-weight:400;line-height:40x;color:#666666;border-bottom:1px solid #ecedee;text-align:center;padding:15px 0;">
+                                    <th style="padding: 0 15px 0 0;">Amount</th>
+                                    <th style="padding: 0 15px;">Date</th>
+                                    <th style="padding: 0 15px;">Type</th>
+                                  </tr>
+                                  <tr style="font-family:Montserrat, Helvetica, Arial, sans-serif;font-size:16px;font-weight:400;line-height:40x;background-color:{{ background_color }};color:#FFFFFF;border-bottom:1px solid #ecedee;text-align:center;padding:15px 0;">
+                                    <td style="padding: 8px 5px 5px 5px;">$ {{ payment_amount }}</td>
+                                    <td style="padding: 8px 5px 5px 5px;">{{ current_date }}</td>
+                                    <td style="padding: 8px 5px 5px 5px;">{{ payment_type }}</td>
+                                  </tr>
+                                </table>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                </tr>
+                <tr>
+                  <td align="left" style="font-size:0px;padding:30px 4px 10px 4px;word-break:break-word;">
+                    <div style="font-family:Montserrat, Helvetica, Arial, sans-serif;font-size:16px;font-weight:300;line-height:40x;text-align:left;color:#666666;">
+                        With the above payment, your <strong>{{ contrib_field | title }}</strong> account status is as follows:
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td align="left" style="font-size:0px;padding:10px 4px 10px 4px;word-break:break-word;">
+                    <div style="margin:0px auto;max-width:600px;">
+                      <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width:100%;">
+                        <tbody>
+                          <tr>
+                            <td style="direction:ltr;font-size:0px;padding:20px 0;text-align:center;">
+                              <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td class="" style="vertical-align:top;width:600px;" ><![endif]-->
+                              <div class="mj-column-per-100 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;">
+                                <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%">
+                                  <tbody>
+                                    <tr>
+                                      <td align="left" style="font-size:0px;padding:10px;word-break:break-word;">
+                                        <table cellpadding="0" cellspacing="0" width="100%" border="0" style="color:#000000;font-family:Ubuntu, Helvetica, Arial, sans-serif;font-size:13px;line-height:22px;table-layout:auto;width:100%;border:none;">
+                                          <tr style="font-family:Montserrat, Helvetica, Arial, sans-serif;font-size:16px;font-weight:400;line-height:40x;color:#666666;border-bottom:1px solid #ecedee;text-align:center;padding:15px 0;">
+                                            <th style="padding: 0 15px 0 0;">Required</th>
+                                            <th style="padding: 0 15px;">Paid</th>
+                                            <th style="padding: 0 0 0 15px;">Unpaid</th>
+                                          </tr>
+                                          <tr style="font-family:Montserrat, Helvetica, Arial, sans-serif;font-size:16px;font-weight:400;line-height:40x;color:#666666;border-bottom:1px solid #ecedee;text-align:center;padding:15px 0;">
+                                            <td style="padding: 8px 5px 5px 5px;">$ {{ required_amount }}</td>
+                                            <td style="padding: 8px 5px 5px 5px;">$ {{ total_paid }}</td>
+                                            <td style="padding: 8px 5px 5px 5px;">$ {{ unpaid }}</td>
+                                          </tr>
+                                        </table>
+                                      </td>
+                                    </tr>
+                                  </tbody>
+                                </table>
+                              </div>
+                              <!--[if mso | IE]></td></tr></table><![endif]-->
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td align="left" style="font-size:0px;padding:10px 4px 20px 4px;word-break:break-word;">
+                    <div style="font-family:Montserrat, Helvetica, Arial, sans-serif;font-size:16px;font-weight:300;line-height:40x;text-align:left;color:#666666;">For more details login to your account.</div>
+                  </td>
+                </tr>
+                <tr>
+                  <td align="center" vertical-align="middle" style="font-size:0px;padding:10px;padding-top:20PX;padding-bottom:20px;word-break:break-word;">
+                    <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="border-collapse:separate;line-height:100%;">
+                      <tr>
+                        <td align="center" bgcolor="#012970" role="presentation" style="border:none;border-radius:2px;cursor:auto;mso-padding-alt:15px 30px;background:#012970;" valign="middle">
+                          <a href="{{ front_end_host }}" style="display:inline-block;background:#012970;color:#FFFFFF;font-family:Montserrat, Helvetica, Arial, sans-serif;font-size:14px;font-weight:500;line-height:120%;margin:0;text-decoration:none;text-transform:none;padding:15px 30px;mso-padding-alt:0px;border-radius:2px;" target="_blank">
+                              LOGIN
+                          </a>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td align="left" style="font-size:0px;padding:10px 4px 10px 4px;word-break:break-word;">
+                    <div style="font-family:Montserrat, Helvetica, Arial, sans-serif;font-size:16px;font-weight:300;line-height:40x;text-align:left;color:#666666;">Best,</div>
+                  </td>
+                </tr>
+                <tr>
+                  <td align="left" style="font-size:0px;padding:10px 4px 30px 4px;word-break:break-word;">
+                    <div style="font-family:Montserrat, Helvetica, Arial, sans-serif;font-size:16px;font-weight:300;line-height:40x;text-align:left;color:#666666;">Djanghi Team</div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <!--[if mso | IE]></td></tr></table><![endif]-->
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+{% endblock %}

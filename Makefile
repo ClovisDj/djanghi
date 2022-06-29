@@ -38,9 +38,9 @@ migrate:
 	$(user-shell) sh -c "./manage.py migrate"
 
 down:
-	docker-compose down
+	docker-compose down --remove-orphans
 
-n := 2
+n := $$(nproc --all)
 # Ex: make pytest n=6
 pytest:
 	$(user-shell) bash -c "pytest -n $(n) --cov=apps --cov-report=term"

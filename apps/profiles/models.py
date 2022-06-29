@@ -90,6 +90,7 @@ class User(AbstractUser):
     country_of_birth = models.CharField(max_length=100, null=True, blank=True)
     sex = models.CharField(max_length=2, choices=SEX_CHOICES, default=UNSPECIFIED)
     address = models.CharField(max_length=300, null=True, blank=True)
+    notify_on_payment = models.BooleanField(default=True)
 
     groups = models.ManyToManyField(
         CustomGroup,
@@ -139,6 +140,16 @@ class User(AbstractUser):
             raise ValidationError(
                 {'sex': f'{self.sex} is not a valid choice'}
             )
+
+    @property
+    def can_receive_payment_notification(self):
+        return (
+            self.is_active and
+            self.is_registered and
+            self.notify_on_payment and
+            self.association.is_active and
+            self.association.notify_user_payments
+        )
 
     def clean(self):
         super().clean()

@@ -1,6 +1,5 @@
 import copy
 import datetime
-from django.core.mail.message import EmailMultiAlternatives
 from django.core import mail
 from django.conf import settings
 from django.test import Client
