@@ -7,6 +7,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import AbstractUser, Group, Permission, UserManager
 from django.db import models
+from phonenumber_field.modelfields import PhoneNumberField
 
 from apps.profiles.roles import FULL_ADMIN, PAYMENT_MANAGER, COST_MANAGER, COTISATION_MANAGER
 from apps.utils import CreateUpdateDateMixin, UUIDModelMixin, is_valid_uuid
@@ -90,7 +91,14 @@ class User(AbstractUser):
     country_of_birth = models.CharField(max_length=100, null=True, blank=True)
     sex = models.CharField(max_length=2, choices=SEX_CHOICES, default=UNSPECIFIED)
     address = models.CharField(max_length=300, null=True, blank=True)
+    city = models.CharField(max_length=300, null=True, blank=True)
+    country = models.CharField(max_length=300, null=True, blank=True)
+    state = models.CharField(max_length=300, null=True, blank=True)
+    zip_code = models.CharField(max_length=300, null=True, blank=True)
+    phone_number = PhoneNumberField(null=True, blank=True)
+    # Settings
     notify_on_payment = models.BooleanField(default=True)
+    receive_association_notification = models.BooleanField(default=True)
 
     groups = models.ManyToManyField(
         CustomGroup,
