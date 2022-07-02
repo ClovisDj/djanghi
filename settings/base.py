@@ -56,6 +56,7 @@ PACKAGE_APPS = [
     'django_extensions',
     'corsheaders',
     'anymail',
+    'phonenumber_field',
 ]
 
 DJANGHI_APPS = [
