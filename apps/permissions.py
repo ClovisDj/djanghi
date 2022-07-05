@@ -94,13 +94,13 @@ class PasswordResetPermission(BasePermission):
         if request.method.lower() != 'post':
             return False
 
-        association__label = request.data.get('association_label')
+        association_label = request.data.get('association_label')
         email = request.data.get('email')
-        if not association__label or not email:
+        if not association_label or not email:
             return False
 
         user_qs = User.objects.get_actives().filter(
-            association__label__iexact=association__label,
+            association__label__iexact=association_label,
             email__iexact=email
         )
 

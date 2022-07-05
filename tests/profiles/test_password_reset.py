@@ -24,7 +24,7 @@ class TestPasswordResetLink(ActMixin):
 
         self.act(self.list_url,
                  base_client,
-                 data={'email': user_alice.email, 'association_label': association_abc.label},
+                 data={'email': user_alice.email, 'association': association_abc.label},
                  status_code=status.HTTP_401_UNAUTHORIZED)
 
     def test_an_inactive_user_from_an_active_association_cannot_reset_his_password(self, base_client, user_alice,
