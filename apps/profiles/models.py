@@ -279,3 +279,31 @@ class UserRegistrationLink(CreateUpdateDateMixin, UUIDModelMixin, models.Model):
     @property
     def is_active(self):
         return not self.is_deactivated and timezone.now() < self.expiration_date
+
+
+class PasswordResetLink(CreateUpdateDateMixin,
+                        UUIDModelMixin,
+                        models.Model):
+    association = models.ForeignKey(
+        'associations.Association',
+        on_delete=models.CASCADE
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='password_resets'
+    )
+    expiration_date = models.DateTimeField(null=False, blank=False)
+    link = models.URLField(null=False, blank=False)
+
+    def save(self, *args, **kwargs):
+        schema = 'http://' if settings.ENVIRONMENT.lower() == 'local' else 'https://'
+        self.link = f'{schema}{settings.API_HOST}/password-reset/{str(self.association_id)}/{str(self.user_id)}/' \
+                    f'{str(self.id)}'
+        self.expiration_date = timezone.now() + settings.PASSWORD_RESET_EXPIRATION_DELTA
+
+        return super().save(*args, **kwargs)
+
+    @property
+    def is_active(self):
+        return not timezone.now() < self.expiration_date

@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
-
+from datetime import timedelta
 from pathlib import Path
 
 import environ
@@ -188,8 +188,10 @@ if ENVIRONMENT.lower() == 'prod':
     CSRF_COOKIE_SECURE = True
 
 AUTH_USER_MODEL = 'profiles.User'
+
 AUTHENTICATION_BACKENDS = [
     'apps.extensions.backend.DjanghiModelBackend',
     'django.contrib.auth.backends.ModelBackend',
 ]
 
+PASSWORD_RESET_EXPIRATION_DELTA = timedelta(hours=ENV.int('PASSWORD_RESET_EXPIRATION_DELTA'))
