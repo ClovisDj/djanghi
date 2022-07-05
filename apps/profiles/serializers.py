@@ -9,7 +9,7 @@ from rest_framework_simplejwt.serializers import TokenObtainSerializer
 from rest_framework_simplejwt.settings import api_settings
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .models import User, UserRegistrationLink, UserRole
+from .models import User, UserRegistrationLink, UserRole, PasswordResetLink
 from ..associations.serializers import AssociationModelSerializer
 from ..extensions.backend import DjanghiModelBackend
 
@@ -307,3 +307,28 @@ class UserRegistrationForm(forms.Form):
         link.is_deactivated = True
         link.save()
         return link
+
+
+class PasswordResetLinkModelSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(write_only=True, required=True)
+    association_label = serializers.CharField(write_only=True, required=True)
+
+    class Meta:
+        model = PasswordResetLink
+        read_only_fields = (
+            'created_at',
+            'updated_at',
+        )
+        exclude = (
+            'association',
+            'user',
+            'expiration_date',
+            'link',
+        )
+
+    def create(self, validated_data):
+        validated_data['user'] = User.objects.get(email=validated_data['email'].lower())
+        validated_data['association'] = validated_data['user'].association
+        validated_data.pop('association_label', False)
+        validated_data.pop('email', False)
+        return super().create(validated_data)

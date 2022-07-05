@@ -85,3 +85,26 @@ class RegularUserNestedRoutePermission(IsNesterUserRouteMixin, BasePermission):
             return request.parser_context['kwargs']['user_pk'] == str(request.user.id)
 
         return True
+
+
+class PasswordResetPermission(BasePermission):
+    def has_permission(self, request, view):
+        from apps.profiles.models import User
+
+        if request.method.lower() != 'post':
+            return False
+
+        association__label = request.data.get('association_label')
+        email = request.data.get('email')
+        if not association__label or not email:
+            return False
+
+        user_qs = User.objects.get_actives().filter(
+            association__label__iexact=association__label,
+            email__iexact=email
+        )
+
+        if not user_qs.exists():
+            return False
+
+        return True

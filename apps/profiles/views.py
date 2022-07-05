@@ -15,11 +15,11 @@ from rest_framework_json_api.views import AutoPrefetchMixin
 from rest_framework_simplejwt.views import TokenObtainPairView
 
 from apps.associations.models import Association
-from apps.permissions import IsUserOrAdmin, IsFullAdmin
+from apps.permissions import IsUserOrAdmin, IsFullAdmin, PasswordResetPermission
 from apps.profiles import serializers, roles
-from apps.profiles.models import User, UserRegistrationLink
+from apps.profiles.models import User, UserRegistrationLink, PasswordResetLink
 from apps.profiles.serializers import UserModelSerializer, UserAdminModelSerializer, UserRegistrationModelSerializer, \
-    UserRegistrationForm
+    UserRegistrationForm, PasswordResetLinkModelSerializer
 from apps.utils import is_valid_uuid, _force_login
 
 
@@ -147,3 +147,15 @@ class UserRegistrationView(View):
                 error_message.append(error_dict['message'])
 
         return render(request, self.template_name, {'form': form, 'errors': error_message})
+
+
+class PasswordResetLinkModelViewSet(mixins.CreateModelMixin,
+                                    GenericViewSet):
+
+    queryset = PasswordResetLink.objects.all()
+    serializer_class = PasswordResetLinkModelSerializer
+    permission_classes = (PasswordResetPermission, )
+
+    @transaction.atomic
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
