@@ -1,13 +1,7 @@
-import copy
-import datetime
 from django.core import mail
-from django.conf import settings
-from django.test import Client
 from django.urls import reverse
-from django.utils import timezone
 from rest_framework import status
 
-from apps.profiles import roles
 from tests import ActMixin
 
 
@@ -79,4 +73,17 @@ class TestPasswordResetLink(ActMixin):
                  status_code=status.HTTP_201_CREATED)
 
         assert user_alice.password_resets.count() == 1
+
+    def test_reset_password_endpoint_should_send_reset_email(self, base_client, user_alice, association_abc):
+        assert len(mail.outbox) == 0
+
+        self.act(self.list_url,
+                 base_client,
+                 data={
+                     'email': user_alice.username.upper(),
+                     'association_label': association_abc.label.title()
+                 },
+                 status_code=status.HTTP_201_CREATED)
+
+        assert len(mail.outbox) == 1
 
