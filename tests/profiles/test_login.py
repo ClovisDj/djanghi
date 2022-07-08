@@ -42,7 +42,7 @@ class TestUserLoginView(ActMixin):
         response = base_client.post(self.login_url, {
             'email': user_alice.email,
             'password': 'Password123',
-            'association': 'NON EXISTING'
+            'association_label': 'NON EXISTING'
         })
         response_data = response.json()
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
@@ -59,7 +59,7 @@ class TestUserLoginView(ActMixin):
             {
                 'email': inactive_abc_user.email,
                 'password': 'password',
-                'association': inactive_abc_user.association.label
+                'association_label': inactive_abc_user.association.label
             },
             status_code=status.HTTP_401_UNAUTHORIZED
         )
@@ -78,7 +78,7 @@ class TestUserLoginView(ActMixin):
             {
                 'email': inactive_abc_user.email,
                 'password': 'password',
-                'association': inactive_abc_user.association.label
+                'association_label': inactive_abc_user.association.label
             },
             status_code=status.HTTP_401_UNAUTHORIZED
         )
@@ -87,7 +87,7 @@ class TestUserLoginView(ActMixin):
         response = base_client.post(self.login_url, {
             'email': user_alice.email,
             'password': 'Password123',
-            'association': association_abc.label.upper()
+            'association_label': association_abc.label.upper()
         })
         response_data = response.json()['data']
         assert response.status_code == status.HTTP_200_OK
@@ -100,6 +100,6 @@ class TestUserLoginView(ActMixin):
         response = base_client.post(self.login_url, {
             'email': user_alice.email,
             'password': 'Password123',
-            'association': association_xyz.label
+            'association_label': association_xyz.label
         })
         assert response.status_code == status.HTTP_401_UNAUTHORIZED

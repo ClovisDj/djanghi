@@ -20,19 +20,19 @@ class LoginSerializer(TokenObtainSerializer):
         super().__init__(*args, **kwargs)
 
         self.user = None
-        self.fields['association'] = serializers.CharField(max_length=30)
+        self.fields['association_label'] = serializers.CharField(max_length=30)
 
     @classmethod
     def get_token(cls, user):
         return RefreshToken.for_user(user)
 
     def validate(self, attrs):
-        association_label = attrs.get('association')
+        association_label = attrs.get('association_label')
 
         authenticate_kwargs = {
             self.username_field: attrs[self.username_field],
             'password': attrs['password'],
-            'association': association_label
+            'association_label': association_label
         }
         try:
             authenticate_kwargs['request'] = self.context['request']

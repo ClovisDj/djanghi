@@ -15,7 +15,7 @@ class DjanghiModelBackend(ModelBackend):
         user_kwargs = {
             'email': username.lower()
         }
-        association_label = kwargs.get('association')
+        association_label = kwargs.get('association_label')
         if association_label:
             user_kwargs['association__label__iexact'] = association_label
 

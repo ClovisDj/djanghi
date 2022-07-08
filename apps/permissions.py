@@ -101,7 +101,8 @@ class PasswordResetPermission(BasePermission):
 
         user_qs = User.objects.get_actives().filter(
             association__label__iexact=association_label,
-            email__iexact=email
+            email__iexact=email,
+            is_registered=True
         )
 
         if not user_qs.exists():
