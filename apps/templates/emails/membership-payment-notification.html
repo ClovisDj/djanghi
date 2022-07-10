@@ -33,7 +33,7 @@
                 <tr>
                   <td align="left" style="font-size:0px;padding:10px 4px 20px 4px;word-break:break-word;">
                     <div class="mj-column-per-100 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;">
-                        <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%">
+                        <table class="payment-table" border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%">
                           <tbody>
                             <tr>
                               <td align="left" style="font-size:0px;padding:10px;word-break:break-word;">
@@ -42,11 +42,13 @@
                                     <th style="padding: 0 15px 0 0;">Amount</th>
                                     <th style="padding: 0 15px;">Date</th>
                                     <th style="padding: 0 15px;">Type</th>
+                                    <th style="padding: 0 15px;">Author</th>
                                   </tr>
                                   <tr style="font-family:Montserrat, Helvetica, Arial, sans-serif;font-size:16px;font-weight:400;line-height:40x;background-color:{{ background_color }};color:#FFFFFF;border-bottom:1px solid #ecedee;text-align:center;padding:15px 0;">
                                     <td style="padding: 8px 5px 5px 5px;">$ {{ payment_amount }}</td>
                                     <td style="padding: 8px 5px 5px 5px;">{{ current_date }}</td>
                                     <td style="padding: 8px 5px 5px 5px;">{{ payment_type }}</td>
+                                    <td style="padding: 8px 5px 5px 5px;">{{ author_name }}</td>
                                   </tr>
                                 </table>
                               </td>

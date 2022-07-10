@@ -128,6 +128,32 @@ class UserModelSerializer(BaseUserModelSerializer):
     }
 
 
+class IncludedUserModelSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        read_only_fields = (
+            'created_at',
+            'updated_at',
+            'date_joined',
+            'last_login',
+            'is_registered',
+            'email',
+            'is_active',
+        )
+        fields = (
+            'first_name',
+            'last_name',
+        )
+
+    class JSONAPIMeta:
+        included_resources = ('association', )
+
+    included_serializers = {
+        'association': AssociationModelSerializer,
+    }
+
+
 class UserAdminModelSerializer(UserModelSerializer):
     is_admin = serializers.SerializerMethodField()
     is_full_admin = serializers.SerializerMethodField()

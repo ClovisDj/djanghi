@@ -5,7 +5,7 @@ from rest_framework_json_api import serializers
 from apps.associations.serializers import MemberContributionFieldModelSerializer
 from apps.payments.models import MembershipPayment, MembershipPaymentSatus
 from apps.profiles.models import User
-from apps.profiles.serializers import UserModelSerializer, BaseUserModelSerializer
+from apps.profiles.serializers import BaseUserModelSerializer, IncludedUserModelSerializer
 
 
 class BaseMembershipPaymentModelSerializer(serializers.ModelSerializer):
@@ -49,7 +49,7 @@ class MembershipPaymentModelSerializer(BaseMembershipPaymentModelSerializer):
 
     included_serializers = {
         'membership_payment_type': MemberContributionFieldModelSerializer,
-        'author': UserModelSerializer,
+        'author': IncludedUserModelSerializer,
     }
 
     def extract_user_id_from_request(self):

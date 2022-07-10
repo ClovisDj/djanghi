@@ -4,7 +4,7 @@ from django.dispatch import receiver
 from django.utils import timezone
 
 from apps.payments.models import MembershipPayment, MembershipPaymentSatus
-from apps.utils import send_html_templated_email
+from apps.utils import send_html_templated_email, get_user_simplified_name
 
 
 @receiver(post_save, sender=MembershipPayment)
@@ -39,6 +39,7 @@ def update_membership_payments_status(sender, instance, created, **kwargs):
                 "contrib_field": instance.membership_payment_type.name,
                 "required_amount": required_amount,
                 "total_paid": status_object.current_value,
+                "author_name": get_user_simplified_name(instance.author),
                 "unpaid": 0,
             }
             if required_amount > status_object.current_value:
