@@ -294,6 +294,7 @@ class PasswordResetLink(CreateUpdateDateMixin,
         related_name='password_resets'
     )
     expiration_date = models.DateTimeField(null=False, blank=False)
+    is_deactivated = models.BooleanField(default=False)
     link = models.URLField(null=False, blank=False)
 
     def save(self, *args, **kwargs):
@@ -306,4 +307,4 @@ class PasswordResetLink(CreateUpdateDateMixin,
 
     @property
     def is_active(self):
-        return not timezone.now() < self.expiration_date
+        return not self.is_deactivated and timezone.now() < self.expiration_date

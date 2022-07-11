@@ -284,17 +284,7 @@ class UserRegistrationModelSerializer(serializers.ModelSerializer):
         return instance
 
 
-class UserRegistrationForm(forms.Form):
-    first_name = forms.CharField(max_length=150, required=True, widget=forms.TextInput(attrs={
-        'class': 'form-control',
-        'placeholder': "First Name",
-        'id': "first_name"
-    }))
-    last_name = forms.CharField(max_length=150, required=True, widget=forms.TextInput(attrs={
-        'class': 'form-control',
-        'placeholder': "Last Name",
-        'id': "last_name"
-    }))
+class BaseUserForm(forms.Form):
     password = forms.CharField(required=True, min_length=6, widget=forms.TextInput(attrs={
         'type': 'password',
         'class': 'form-control',
@@ -319,7 +309,48 @@ class UserRegistrationForm(forms.Form):
         return cleaned_data
 
     @staticmethod
-    def activate_user(user, cleaned_data):
+    def deactivate_link(link):
+        link.is_deactivated = True
+        link.save()
+        return link
+
+
+class UserRegistrationForm(BaseUserForm):
+    first_name = forms.CharField(max_length=150, required=True, widget=forms.TextInput(attrs={
+        'class': 'form-control',
+        'placeholder': "First Name",
+        'id': "first_name"
+    }))
+    last_name = forms.CharField(max_length=150, required=True, widget=forms.TextInput(attrs={
+        'class': 'form-control',
+        'placeholder': "Last Name",
+        'id': "last_name"
+    }))
+    # password = forms.CharField(required=True, min_length=6, widget=forms.TextInput(attrs={
+    #     'type': 'password',
+    #     'class': 'form-control',
+    #     'placeholder': "Your Password",
+    #     'name': "password",
+    #     'id': "password"
+    # }))
+    # password_verification = forms.CharField(required=True, min_length=6, widget=forms.TextInput(attrs={
+    #     'type': 'password',
+    #     'class': 'form-control',
+    #     'placeholder': " Re-enter Your Password",
+    #     'name': "password Verification",
+    #     'id': "password_verification"
+    # }))
+    #
+    # def clean(self):
+    #     cleaned_data = super().clean()
+    #
+    #     if cleaned_data.get('password') != cleaned_data.get('password_verification'):
+    #         self.add_error('password_verification', 'Password mis-match')
+    #
+    #     return cleaned_data
+
+    @staticmethod
+    def activation_actions(user, cleaned_data):
         user.first_name = cleaned_data['first_name']
         user.last_name = cleaned_data['last_name']
         user.is_active = True
@@ -328,11 +359,19 @@ class UserRegistrationForm(forms.Form):
         user.save()
         return user
 
+    # @staticmethod
+    # def deactivate_link(link):
+    #     link.is_deactivated = True
+    #     link.save()
+    #     return link
+
+
+class PasswordResetForm(BaseUserForm):
     @staticmethod
-    def deactivate_link(link):
-        link.is_deactivated = True
-        link.save()
-        return link
+    def activation_actions(user, cleaned_data):
+        user.set_password(cleaned_data['password'])
+        user.save()
+        return user
 
 
 class PasswordResetLinkModelSerializer(serializers.ModelSerializer):

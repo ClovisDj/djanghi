@@ -21,6 +21,7 @@ class Migration(migrations.Migration):
                 ('updated_at', models.DateTimeField(auto_now=True)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('expiration_date', models.DateTimeField()),
+                ('is_deactivated', models.BooleanField(default=False)),
                 ('link', models.URLField()),
                 ('association', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='associations.association')),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='password_resets', to=settings.AUTH_USER_MODEL)),
