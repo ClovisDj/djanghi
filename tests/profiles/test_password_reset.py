@@ -1,7 +1,9 @@
 from django.core import mail
+from django.test import Client
 from django.urls import reverse
 from rest_framework import status
 
+from apps.profiles.models import PasswordResetLink
 from tests import ActMixin
 
 
@@ -98,4 +100,94 @@ class TestPasswordResetLink(ActMixin):
                  status_code=status.HTTP_201_CREATED)
 
         assert len(mail.outbox) == 1
+
+
+class TestPasswordResetPage:
+    url = '/password-reset/{association_id}/{user_id}/{link_id}'
+    client = Client()
+
+    @property
+    def password_data(self):
+        return {
+            'password': '123Password',
+            'password_verification': '123Password',
+        }
+
+    def test_cannot_retrieve_an_expired_link_page(self, expired_abc_user_password_reset_link):
+        response = self.client.get(
+            self.url.format(
+                association_id=str(expired_abc_user_password_reset_link.association_id),
+                user_id=str(expired_abc_user_password_reset_link.user_id),
+                link_id=str(expired_abc_user_password_reset_link.id),
+            )
+        )
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_cannot_retrieve_a_deactivated_password_reset_link_page(self, active_abc_user_password_reset_link):
+        active_abc_user_password_reset_link.is_deactivated = True
+        active_abc_user_password_reset_link.save()
+        assert not active_abc_user_password_reset_link.is_active
+
+        response = self.client.get(
+            self.url.format(
+                association_id=str(active_abc_user_password_reset_link.association_id),
+                user_id=str(active_abc_user_password_reset_link.user_id),
+                link_id=str(active_abc_user_password_reset_link.id),
+            )
+        )
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_cannot_retrieve_an_expired_password_reset_link_page(self, expired_abc_user_password_reset_link):
+
+        assert not expired_abc_user_password_reset_link.is_active
+        assert not expired_abc_user_password_reset_link.is_deactivated
+
+        response = self.client.get(
+            self.url.format(
+                association_id=str(expired_abc_user_password_reset_link.association_id),
+                user_id=str(expired_abc_user_password_reset_link.user_id),
+                link_id=str(expired_abc_user_password_reset_link.id),
+            )
+        )
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_cannot_retrieve_malformed_password_reset_link_page(self, active_abc_user_password_reset_link,
+                                                                association_xyz):
+        response = self.client.get(
+            self.url.format(
+                association_id=str(association_xyz.id),
+                user_id=str(active_abc_user_password_reset_link.user_id),
+                link_id=str(active_abc_user_password_reset_link.id),
+            )
+        )
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_can_open_a_valid_password_reset_link_page(self, active_abc_user_password_reset_link):
+        response = self.client.get(
+            self.url.format(
+                association_id=str(active_abc_user_password_reset_link.association_id),
+                user_id=str(active_abc_user_password_reset_link.user_id),
+                link_id=str(active_abc_user_password_reset_link.id),
+            )
+        )
+        assert response.status_code == status.HTTP_200_OK
+
+    def test_user_can_reset_password_with_valid_password_reset_link(self, active_abc_user_password_reset_link):
+        assert active_abc_user_password_reset_link.is_active
+
+        resp = self.client.post(
+            self.url.format(
+                association_id=str(active_abc_user_password_reset_link.association_id),
+                user_id=str(active_abc_user_password_reset_link.user_id),
+                link_id=str(active_abc_user_password_reset_link.id),
+            ),
+            data=self.password_data
+        )
+
+        active_abc_user_password_reset_link.refresh_from_db()
+        assert active_abc_user_password_reset_link.is_deactivated
+        assert not active_abc_user_password_reset_link.is_active
+        assert resp.status_code == status.HTTP_302_FOUND
+        assert 'refresh=' in resp.url
+        assert 'access=' in resp.url
 

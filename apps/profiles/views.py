@@ -14,14 +14,13 @@ from rest_framework.viewsets import GenericViewSet
 from rest_framework_json_api.views import AutoPrefetchMixin
 from rest_framework_simplejwt.views import TokenObtainPairView
 
-from apps.associations.models import Association
 from apps.mixins import RequestLinkValidation
 from apps.permissions import IsUserOrAdmin, IsFullAdmin, PasswordResetPermission
 from apps.profiles import serializers, roles
 from apps.profiles.models import User, UserRegistrationLink, PasswordResetLink
 from apps.profiles.serializers import UserModelSerializer, UserAdminModelSerializer, UserRegistrationModelSerializer, \
     UserRegistrationForm, PasswordResetLinkModelSerializer, PasswordResetForm
-from apps.utils import is_valid_uuid, _force_login
+from apps.utils import _force_login
 
 
 class ApiLoginView(TokenObtainPairView):
