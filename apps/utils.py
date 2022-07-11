@@ -79,3 +79,9 @@ def send_html_templated_email(recipients, template_path, subject, email_type, co
 
     logger.info(f'Successfully sent {email_type} email for: {recipients}')
     return True
+
+
+def get_user_simplified_name(user_object):
+    first_name = user_object.first_name.split(' ')[0]
+    last_name = user_object.last_name.split(' ')[0]
+    return f'{first_name} {last_name}'

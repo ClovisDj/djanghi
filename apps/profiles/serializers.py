@@ -9,7 +9,7 @@ from rest_framework_simplejwt.serializers import TokenObtainSerializer
 from rest_framework_simplejwt.settings import api_settings
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .models import User, UserRegistrationLink, UserRole
+from .models import User, UserRegistrationLink, UserRole, PasswordResetLink
 from ..associations.serializers import AssociationModelSerializer
 from ..extensions.backend import DjanghiModelBackend
 
@@ -20,19 +20,19 @@ class LoginSerializer(TokenObtainSerializer):
         super().__init__(*args, **kwargs)
 
         self.user = None
-        self.fields['association'] = serializers.CharField(max_length=30)
+        self.fields['association_label'] = serializers.CharField(max_length=30)
 
     @classmethod
     def get_token(cls, user):
         return RefreshToken.for_user(user)
 
     def validate(self, attrs):
-        association_label = attrs.get('association')
+        association_label = attrs.get('association_label')
 
         authenticate_kwargs = {
             self.username_field: attrs[self.username_field],
             'password': attrs['password'],
-            'association': association_label
+            'association_label': association_label
         }
         try:
             authenticate_kwargs['request'] = self.context['request']
@@ -118,6 +118,32 @@ class UserModelSerializer(BaseUserModelSerializer):
             'is_superuser',
             'is_staff',
             'roles',
+        )
+
+    class JSONAPIMeta:
+        included_resources = ('association', )
+
+    included_serializers = {
+        'association': AssociationModelSerializer,
+    }
+
+
+class IncludedUserModelSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        read_only_fields = (
+            'created_at',
+            'updated_at',
+            'date_joined',
+            'last_login',
+            'is_registered',
+            'email',
+            'is_active',
+        )
+        fields = (
+            'first_name',
+            'last_name',
         )
 
     class JSONAPIMeta:
@@ -258,17 +284,7 @@ class UserRegistrationModelSerializer(serializers.ModelSerializer):
         return instance
 
 
-class UserRegistrationForm(forms.Form):
-    first_name = forms.CharField(max_length=150, required=True, widget=forms.TextInput(attrs={
-        'class': 'form-control',
-        'placeholder': "First Name",
-        'id': "first_name"
-    }))
-    last_name = forms.CharField(max_length=150, required=True, widget=forms.TextInput(attrs={
-        'class': 'form-control',
-        'placeholder': "Last Name",
-        'id': "last_name"
-    }))
+class BaseUserForm(forms.Form):
     password = forms.CharField(required=True, min_length=6, widget=forms.TextInput(attrs={
         'type': 'password',
         'class': 'form-control',
@@ -293,7 +309,26 @@ class UserRegistrationForm(forms.Form):
         return cleaned_data
 
     @staticmethod
-    def activate_user(user, cleaned_data):
+    def deactivate_link(link):
+        link.is_deactivated = True
+        link.save()
+        return link
+
+
+class UserRegistrationForm(BaseUserForm):
+    first_name = forms.CharField(max_length=150, required=True, widget=forms.TextInput(attrs={
+        'class': 'form-control',
+        'placeholder': "First Name",
+        'id': "first_name"
+    }))
+    last_name = forms.CharField(max_length=150, required=True, widget=forms.TextInput(attrs={
+        'class': 'form-control',
+        'placeholder': "Last Name",
+        'id': "last_name"
+    }))
+
+    @staticmethod
+    def activation_actions(user, cleaned_data):
         user.first_name = cleaned_data['first_name']
         user.last_name = cleaned_data['last_name']
         user.is_active = True
@@ -302,8 +337,35 @@ class UserRegistrationForm(forms.Form):
         user.save()
         return user
 
+
+class PasswordResetForm(BaseUserForm):
     @staticmethod
-    def deactivate_link(link):
-        link.is_deactivated = True
-        link.save()
-        return link
+    def activation_actions(user, cleaned_data):
+        user.set_password(cleaned_data['password'])
+        user.save()
+        return user
+
+
+class PasswordResetLinkModelSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(write_only=True, required=True)
+    association_label = serializers.CharField(write_only=True, required=True)
+
+    class Meta:
+        model = PasswordResetLink
+        read_only_fields = (
+            'created_at',
+            'updated_at',
+        )
+        exclude = (
+            'association',
+            'user',
+            'expiration_date',
+            'link',
+        )
+
+    def create(self, validated_data):
+        validated_data['user'] = User.objects.get(email=validated_data['email'].lower())
+        validated_data['association'] = validated_data['user'].association
+        validated_data.pop('association_label', False)
+        validated_data.pop('email', False)
+        return super().create(validated_data)

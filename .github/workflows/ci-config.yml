@@ -36,6 +36,7 @@ jobs:
           envkey_SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
           envkey_DEFAULT_FROM_EMAIL: ${{ secrets.DEFAULT_FROM_EMAIL }}
           envkey_CORS_ALLOWED_ORIGINS: ${{ secrets.CORS_ALLOWED_ORIGINS }}
+          envkey_PASSWORD_RESET_EXPIRATION_DELTA: ${{ secrets.PASSWORD_RESET_EXPIRATION_DELTA }}
           file_name: .env
           fail_on_empty: true
       - name: Build images
@@ -80,6 +81,7 @@ jobs:
           envkey_UI_IMAGE_NAME: ${{ secrets.UI_IMAGE_NAME }}
           envkey_NGINX_IMAGE: ${{ secrets.NGINX_IMAGE }}
           envkey_MAINTAINER_EMAIL: ${{ secrets.MAINTAINER_EMAIL }}
+          envkey_PASSWORD_RESET_EXPIRATION_DELTA: ${{ secrets.PASSWORD_RESET_EXPIRATION_DELTA }}
           file_name: .env
           fail_on_empty: true
       - name: Login to Container Registry

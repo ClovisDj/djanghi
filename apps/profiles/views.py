@@ -14,13 +14,13 @@ from rest_framework.viewsets import GenericViewSet
 from rest_framework_json_api.views import AutoPrefetchMixin
 from rest_framework_simplejwt.views import TokenObtainPairView
 
-from apps.associations.models import Association
-from apps.permissions import IsUserOrAdmin, IsFullAdmin
+from apps.mixins import RequestLinkValidation
+from apps.permissions import IsUserOrAdmin, IsFullAdmin, PasswordResetPermission
 from apps.profiles import serializers, roles
-from apps.profiles.models import User, UserRegistrationLink
+from apps.profiles.models import User, UserRegistrationLink, PasswordResetLink
 from apps.profiles.serializers import UserModelSerializer, UserAdminModelSerializer, UserRegistrationModelSerializer, \
-    UserRegistrationForm
-from apps.utils import is_valid_uuid, _force_login
+    UserRegistrationForm, PasswordResetLinkModelSerializer, PasswordResetForm
+from apps.utils import _force_login
 
 
 class ApiLoginView(TokenObtainPairView):
@@ -78,40 +78,8 @@ class UserRegistrationViewSet(mixins.CreateModelMixin,
     allowed_admin_roles = (roles.FULL_ADMIN, roles.PAYMENT_MANAGER, roles.COST_MANAGER, )
 
 
-class UserRegistrationView(View):
-    template_name = 'forms/registration.html'
-    form_class = UserRegistrationForm
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        self.registration_link = None
-        self.association = None
-
-    def request_is_valid(self, association_id, user_id, registration_id):
-        if not is_valid_uuid(association_id) or not is_valid_uuid(user_id) or not is_valid_uuid(registration_id):
-            return False
-
-        try:
-            self.association = Association.objects.get(id=association_id)
-        except Association.DoesNotExist:
-            return False
-
-        try:
-            user = User.objects.for_association(self.association).get(id=user_id)
-        except User.DoesNotExist:
-            return False
-
-        try:
-            registration_link = user.registration_links.all().get(id=registration_id)
-        except UserRegistrationLink.DoesNotExist:
-            return False
-
-        if not registration_link.is_active:
-            return False
-
-        self.registration_link = registration_link
-        return True
+class BaseFormView(View):
+    link_related_name = None
 
     def get_context(self):
         return {
@@ -120,8 +88,8 @@ class UserRegistrationView(View):
         }
 
     def get(self, request, *args, **kwargs):
-        if not self.request_is_valid(kwargs.get('association'), kwargs.get('user'),
-                                     kwargs.get('registration_link')):
+        if not self.request_is_valid(kwargs.get('association'), kwargs.get('user'), kwargs.get('link'),
+                                     self.link_related_name):
             return HttpResponseNotFound()
 
         context = {**self.get_context(), 'form': self.form_class()}
@@ -130,13 +98,13 @@ class UserRegistrationView(View):
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST)
 
-        if not self.request_is_valid(kwargs.get('association'), kwargs.get('user'),
-                                     kwargs.get('registration_link')):
+        if not self.request_is_valid(kwargs.get('association'), kwargs.get('user'), kwargs.get('link'),
+                                     self.link_related_name):
             return HttpResponseNotFound()
 
         if form.is_valid():
-            activated_user = form.activate_user(self.registration_link.user, form.cleaned_data)
-            form.deactivate_link(self.registration_link)
+            activated_user = form.activation_actions(self.link.user, form.cleaned_data)
+            form.deactivate_link(self.link)
             login_data = _force_login(activated_user)
             redirect_url = f'{settings.FRONT_END_HOST}/activated?refresh={login_data[0]}&access={login_data[1]}'
             return HttpResponseRedirect(redirect_url)
@@ -146,4 +114,33 @@ class UserRegistrationView(View):
             for error_dict in error_list:
                 error_message.append(error_dict['message'])
 
-        return render(request, self.template_name, {'form': form, 'errors': error_message})
+        context = {
+            **self.get_context(),
+            'form': form,
+            'errors': error_message
+        }
+        return render(request, self.template_name, context=context)
+
+
+class UserRegistrationView(RequestLinkValidation, BaseFormView):
+    template_name = 'forms/registration.html'
+    form_class = UserRegistrationForm
+    link_related_name = 'registration_links'
+
+
+class PasswordResetView(RequestLinkValidation, BaseFormView):
+    template_name = 'forms/password-reset.html'
+    form_class = PasswordResetForm
+    link_related_name = 'password_resets'
+
+
+class PasswordResetLinkModelViewSet(mixins.CreateModelMixin,
+                                    GenericViewSet):
+
+    queryset = PasswordResetLink.objects.all()
+    serializer_class = PasswordResetLinkModelSerializer
+    permission_classes = (PasswordResetPermission, )
+
+    @transaction.atomic
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
