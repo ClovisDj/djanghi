@@ -101,6 +101,19 @@ def user_alice(user_create_data, association_abc):
 
 
 @pytest.fixture
+def xyz_user_alice(user_create_data, association_xyz):
+    data = copy.deepcopy(user_create_data)
+    data['email'] = 'alice@abc.com'
+    data['first_name'] = 'alice'
+    data['last_name'] = 'Johnson'
+    data['association_id'] = association_xyz.id
+    return User.objects.create_user(
+        'alice@abc.com',
+        **data
+    )
+
+
+@pytest.fixture
 def inactive_abc_user(user_create_data, association_abc):
     data = copy.deepcopy(user_create_data)
     data['email'] = 'abc.user.2@abc.com'

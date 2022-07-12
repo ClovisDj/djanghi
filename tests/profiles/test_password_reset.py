@@ -101,6 +101,20 @@ class TestPasswordResetLink(ActMixin):
 
         assert len(mail.outbox) == 1
 
+    def test_a_user_in_multiple_associations_can_reset_his_password(self, base_client, user_alice, association_abc,
+                                                                    xyz_user_alice, association_xyz):
+        assert len(mail.outbox) == 0
+
+        self.act(self.list_url,
+                 base_client,
+                 data={
+                     'email': user_alice.username.title(),
+                     'association_label': association_xyz.label.title()
+                 },
+                 status_code=status.HTTP_201_CREATED)
+
+        assert len(mail.outbox) == 1
+
 
 class TestPasswordResetPage:
     url = '/password-reset/{association_id}/{user_id}/{link_id}'
