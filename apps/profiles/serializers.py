@@ -364,7 +364,10 @@ class PasswordResetLinkModelSerializer(serializers.ModelSerializer):
         )
 
     def create(self, validated_data):
-        validated_data['user'] = User.objects.get(email=validated_data['email'].lower())
+        validated_data['user'] = User.objects.get(
+            email__iexact=validated_data['email'],
+            association__label__iexact=validated_data['association_label']
+        )
         validated_data['association'] = validated_data['user'].association
         validated_data.pop('association_label', False)
         validated_data.pop('email', False)
