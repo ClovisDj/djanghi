@@ -196,3 +196,44 @@ class TestAdminsMembershipPaymentsStatusViewSet(ActMixin):
         assert len(response['data']) == 1
         assert len(response['included']) == 2
         assert response['included'][1]['id'] == str(alice_full_admin.id)
+
+    def test_authenticated_full_admin_can_filter_payments_status_by_user_ids(self, authenticated_alice_user_client,
+                                                                             alice_full_admin,
+                                                                             abc_user,
+                                                                             abc_payments_type,
+                                                                             abc_user_inscription_payment,
+                                                                             abc_user_membership_payment,
+                                                                             abc_user_assurance_cost,
+                                                                             alice_user_membership_payment,
+                                                                             xyz_user_membership_payment):
+
+        response = self.act(
+            f'{self.list_url}?user_ids={str(abc_user.id)}',
+            authenticated_alice_user_client,
+            method='get',
+            status_code=status.HTTP_200_OK
+        ).json()
+
+        for payment_status in response['data']:
+            assert payment_status['relationships']['user']['data']['id'] == str(abc_user.id)
+
+    def test_should_ignore_malformed_user_ids_in_filter_payments_status_filter(self, authenticated_alice_user_client,
+                                                                               alice_full_admin,
+                                                                               abc_user,
+                                                                               xyz_user,
+                                                                               abc_payments_type,
+                                                                               abc_user_inscription_payment,
+                                                                               abc_user_membership_payment,
+                                                                               abc_user_assurance_cost,
+                                                                               alice_user_membership_payment,
+                                                                               xyz_user_membership_payment):
+
+        response = self.act(
+            f'{self.list_url}?user_ids={str(abc_user.id)},{str(xyz_user.id)},nmdjkndu-masd6sc-enedhu-ew67cv',
+            authenticated_alice_user_client,
+            method='get',
+            status_code=status.HTTP_200_OK
+        ).json()
+
+        for payment_status in response['data']:
+            assert payment_status['relationships']['user']['data']['id'] == str(abc_user.id)

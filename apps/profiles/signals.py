@@ -35,17 +35,18 @@ def send_user_registration_link(sender, instance, created, **kwargs):
 
 @receiver(post_save, sender=PasswordResetLink)
 def send_password_reset_link(sender, instance, created, **kwargs):
-    context = {
-        'first_name': instance.user.first_name,
-        'association_label': instance.association.label,
-        'password_reset_link': instance.link,
-        'host': settings.API_HOST,
-    }
+    if instance.is_active:
+        context = {
+            'first_name': instance.user.first_name,
+            'association_label': instance.association.label,
+            'password_reset_link': instance.link,
+            'host': settings.API_HOST,
+        }
 
-    send_html_templated_email(
-        [instance.user.email],
-        'emails/password-reset.html',
-        f'{instance.association.label.title()} - Password Reset',
-        'password reset link',
-        context=context
-    )
+        send_html_templated_email(
+            [instance.user.email],
+            'emails/password-reset.html',
+            f'{instance.association.label.title()} - Password Reset',
+            'password reset link',
+            context=context
+        )
