@@ -308,3 +308,69 @@ class PasswordResetLink(CreateUpdateDateMixin,
     @property
     def is_active(self):
         return not self.is_deactivated and timezone.now() < self.expiration_date
+
+
+class UserOptInContributionFields(CreateUpdateDateMixin,
+                                  UUIDModelMixin,
+                                  models.Model):
+    REQUESTED = 'REQUESTED'
+    IN_PROCESS = 'PROCESSING'
+    APPROVED = 'APPROVED'
+    DECLINED = 'DECLINED'
+    STATES = (
+        (REQUESTED, 'Requested'),
+        (IN_PROCESS, 'Processing'),
+        (APPROVED, 'Approved'),
+        (DECLINED, 'Declined'),
+    )
+
+    association = models.ForeignKey(
+        'associations.Association',
+        on_delete=models.CASCADE
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='opted_in_contrib_fields'
+    )
+    contrib_field = models.ForeignKey(
+        'associations.Association',
+        on_delete=models.CASCADE,
+        related_name='opted_in_users',
+        null=True,
+        blank=True
+    )
+    approved_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='approved_opt_ins',
+        null=True,
+        blank=True
+    )
+
+    requested_field_id = models.UUIDField()
+    state = models.CharField(max_length=20, choices=STATES, default=REQUESTED)
+    approved_date = models.DateTimeField(null=True, blank=True)
+    note = models.TextField(null=True, blank=True)
+
+    def validate_state(self):
+        is_valid = False
+        for state_choice, _ in self.STATES:
+            if self.state == state_choice:
+                is_valid = True
+                break
+
+        if not is_valid:
+            raise ValidationError(
+                {'state': f'{self.state} is not a valid choice'}
+            )
+
+    def clean(self):
+        super().clean()
+        self.validate_state()
+
+    def save(self, *args, **kwargs):
+
+        self.clean()
+        return super().save(*args, **kwargs)
+

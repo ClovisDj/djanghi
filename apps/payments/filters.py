@@ -20,8 +20,9 @@ class MembershipPaymentsStatusFilter(filters.FilterSet):
         model = MembershipPaymentSatus
         fields = ('membership_payment_type_id', "user_id")
 
-    @staticmethod
-    def filter_by_ids(queryset, value, *args, **kwargs):
+    # @staticmethod
+    def filter_by_ids(self, queryset, value, *args, **kwargs):
+        print(f'>>>>>>>>>>>>>> Request params: {self.request.query_params}')
         if args and len(args) > 0 and isinstance(args[0], str):
             ids = args[0].split(',')
             ids = [user_id for user_id in ids if is_valid_uuid(user_id)]
