@@ -1,4 +1,4 @@
-from django.db.utils import IntegrityError
+from django.db import IntegrityError
 from rest_framework_json_api import serializers
 
 from apps.associations.models import Association, MemberContributionField

@@ -14,12 +14,13 @@ from rest_framework.viewsets import GenericViewSet
 from rest_framework_json_api.views import AutoPrefetchMixin
 from rest_framework_simplejwt.views import TokenObtainPairView
 
-from apps.mixins import RequestLinkValidation
+from apps.mixins import RequestLinkValidation, NesterUserViewQuerySetMixin
 from apps.permissions import IsUserOrAdmin, IsFullAdmin, PasswordResetPermission
 from apps.profiles import serializers, roles
-from apps.profiles.models import User, UserRegistrationLink, PasswordResetLink
+from apps.profiles.models import User, UserRegistrationLink, PasswordResetLink, UserOptInContributionFields
 from apps.profiles.serializers import UserModelSerializer, UserAdminModelSerializer, UserRegistrationModelSerializer, \
-    UserRegistrationForm, PasswordResetLinkModelSerializer, PasswordResetForm
+    UserRegistrationForm, PasswordResetLinkModelSerializer, PasswordResetForm, \
+    UserOptInContributionFieldsModelSerializer
 from apps.utils import _force_login
 
 
@@ -144,3 +145,26 @@ class PasswordResetLinkModelViewSet(mixins.CreateModelMixin,
     @transaction.atomic
     def create(self, request, *args, **kwargs):
         return super().create(request, *args, **kwargs)
+
+
+class UserOptInContributionFieldsModelViewSet(mixins.CreateModelMixin,
+                                              mixins.RetrieveModelMixin,
+                                              mixins.UpdateModelMixin,
+                                              mixins.ListModelMixin,
+                                              mixins.DestroyModelMixin,
+                                              NesterUserViewQuerySetMixin,
+                                              AutoPrefetchMixin,
+                                              GenericViewSet):
+
+    queryset = UserOptInContributionFields.objects.all()
+    serializer_class = UserOptInContributionFieldsModelSerializer
+    allowed_admin_roles = (roles.FULL_ADMIN, )
+    regular_user_allowed_actions = ('post', 'get', )
+
+    @transaction.atomic
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
+
+    @transaction.atomic
+    def update(self, request, *args, **kwargs):
+        return super().update(request, *args, **kwargs)

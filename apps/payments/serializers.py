@@ -3,12 +3,14 @@ import copy
 from rest_framework_json_api import serializers
 
 from apps.associations.serializers import MemberContributionFieldModelSerializer
+from apps.mixins import SerializerRequestInitMixin
 from apps.payments.models import MembershipPayment, MembershipPaymentSatus
 from apps.profiles.models import User
 from apps.profiles.serializers import BaseUserModelSerializer, IncludedUserModelSerializer
 
 
-class BaseMembershipPaymentModelSerializer(serializers.ModelSerializer):
+class BaseMembershipPaymentModelSerializer(SerializerRequestInitMixin,
+                                           serializers.ModelSerializer):
     membership_payment_type_id = serializers.UUIDField(required=True)
     payment_type = serializers.ChoiceField(
         choices=MembershipPayment.PAYMENT_TYPE,
@@ -30,8 +32,6 @@ class BaseMembershipPaymentModelSerializer(serializers.ModelSerializer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.request = getattr(self, 'context', {}).get('request')
-
         if self.instance or (self.request and self.request.method != 'POST'):
             # This field is only required for payment creation
             self.fields.pop('membership_payment_type_id', None)
@@ -52,11 +52,8 @@ class MembershipPaymentModelSerializer(BaseMembershipPaymentModelSerializer):
         'author': IncludedUserModelSerializer,
     }
 
-    def extract_user_id_from_request(self):
-        return self.request.parser_context['kwargs']['user_pk']
-
     def create(self, validated_data):
-        validated_data['user_id'] = self.extract_user_id_from_request()
+        validated_data['user_id'] = self.extract_user_id_from_nested_route()
         validated_data['author'] = self.request.user
         validated_data['association'] = self.request.user.association
 

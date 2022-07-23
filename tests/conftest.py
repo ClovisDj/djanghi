@@ -172,26 +172,34 @@ def alice_full_admin(user_alice):
 
 @pytest.fixture
 def abc_payments_type(association_abc):
-    payment_names = ('Inscription', 'Assurance', 'Membership')
-    return [
+    payment_names = ('Inscription', 'Insurance', 'Membership')
+    contrib_obj_list = [
         MemberContributionField.objects.create(
             name=name,
             association=association_abc
         )
         for name in payment_names
     ]
+    contrib_obj_list[1].member_can_opt_in = True
+    contrib_obj_list[1].save()
+
+    return contrib_obj_list
 
 
 @pytest.fixture
 def xyz_payments_type(association_xyz):
     payment_names = ('Inscription', 'Assurance', 'Membership')
-    return [
+    contrib_obj_list = [
         MemberContributionField.objects.create(
             name=name,
             association=association_xyz
         )
         for name in payment_names
     ]
+    contrib_obj_list[1].member_can_opt_in = True
+    contrib_obj_list[1].save()
+
+    return contrib_obj_list
 
 
 @pytest.fixture

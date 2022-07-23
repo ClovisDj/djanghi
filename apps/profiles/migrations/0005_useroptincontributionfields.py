@@ -26,11 +26,16 @@ class Migration(migrations.Migration):
                 ('note', models.TextField(blank=True, null=True)),
                 ('approved_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='approved_opt_ins', to=settings.AUTH_USER_MODEL)),
                 ('association', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='associations.association')),
-                ('contrib_field', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='opted_in_users', to='associations.association')),
+                ('contrib_field', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='opted_in_users', to='associations.membercontributionfield')),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='opted_in_contrib_fields', to=settings.AUTH_USER_MODEL)),
             ],
             options={
                 'abstract': False,
+                'ordering': ['user__first_name', 'user__last_name', 'user__email']
             },
+        ),
+        migrations.AddConstraint(
+            model_name='useroptincontributionfields',
+            constraint=models.UniqueConstraint(fields=('user', 'requested_field_id'), name='unique_opt_in_by_user'),
         ),
     ]

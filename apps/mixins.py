@@ -1,5 +1,7 @@
 from django.core.exceptions import ObjectDoesNotExist
 
+from apps.utils import is_valid_uuid
+
 
 class RequestLinkValidation:
     def __init__(self, *args, **kwargs):
@@ -38,3 +40,25 @@ class RequestLinkValidation:
         self.link = link
 
         return True
+
+
+class SerializerRequestInitMixin:
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.request = getattr(self, 'context', {}).get('request')
+
+    def extract_user_id_from_nested_route(self):
+        return self.request.parser_context['kwargs']['user_pk']
+
+
+class NesterUserViewQuerySetMixin:
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        user_pk = self.request.parser_context.get('kwargs', {}).get('user_pk')
+        if is_valid_uuid(user_pk):
+            return queryset.filter(user_id=user_pk)
+
+        return queryset

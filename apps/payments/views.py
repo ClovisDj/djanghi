@@ -4,12 +4,12 @@ from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 from rest_framework_json_api.views import AutoPrefetchMixin
 
+from apps.mixins import NesterUserViewQuerySetMixin
 from apps.payments.filters import MembershipPaymentFilter, MembershipPaymentsStatusFilter
 from apps.payments.models import MembershipPayment, MembershipPaymentSatus
 from apps.payments.serializers import MembershipPaymentModelSerializer, MembershipPaymentSatusModelSerializer, \
     BulkMembershipPaymentModelSerializer
 from apps.profiles import roles
-from apps.utils import is_valid_uuid
 
 
 SEARCH_FIELDS = (
@@ -24,6 +24,7 @@ class MembershipPaymentModelViewSet(mixins.CreateModelMixin,
                                     mixins.RetrieveModelMixin,
                                     mixins.ListModelMixin,
                                     AutoPrefetchMixin,
+                                    NesterUserViewQuerySetMixin,
                                     GenericViewSet):
 
     queryset = MembershipPayment.objects.all()
@@ -36,18 +37,10 @@ class MembershipPaymentModelViewSet(mixins.CreateModelMixin,
     def create(self, request, *args, **kwargs):
         return super().create(request, *args, **kwargs)
 
-    def get_queryset(self):
-        queryset = super().get_queryset()
-
-        user_pk = self.request.parser_context.get('kwargs', {}).get('user_pk')
-        if is_valid_uuid(user_pk):
-            return queryset.filter(user_id=user_pk)
-
-        return queryset
-
 
 class AdminMembershipPaymentStatusModelViewSet(mixins.ListModelMixin,
                                                mixins.RetrieveModelMixin,
+                                               NesterUserViewQuerySetMixin,
                                                AutoPrefetchMixin,
                                                GenericViewSet):
 
@@ -56,15 +49,6 @@ class AdminMembershipPaymentStatusModelViewSet(mixins.ListModelMixin,
     filterset_class = MembershipPaymentsStatusFilter
     search_fields = SEARCH_FIELDS
     allowed_admin_roles = (roles.FULL_ADMIN, roles.PAYMENT_MANAGER, roles.COST_MANAGER, )
-
-    def get_queryset(self):
-        queryset = super().get_queryset()
-
-        user_pk = self.request.parser_context.get('kwargs', {}).get('user_pk')
-        if is_valid_uuid(user_pk):
-            return queryset.filter(user_id=user_pk)
-
-        return queryset
 
 
 class MembershipPaymentStatusModelViewSet(AdminMembershipPaymentStatusModelViewSet):

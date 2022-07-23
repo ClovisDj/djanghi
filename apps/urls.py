@@ -18,7 +18,7 @@ from django.urls import path, include
 from rest_framework_nested import routers
 
 from apps.payments.views import MembershipPaymentModelViewSet, MembershipPaymentStatusModelViewSet
-from apps.profiles.views import UserModelViewSet
+from apps.profiles.views import UserModelViewSet, UserOptInContributionFieldsModelViewSet
 
 router = routers.SimpleRouter(trailing_slash=False)
 router.register(r'users', UserModelViewSet, basename='users')
@@ -28,6 +28,8 @@ users_nested_router = routers.NestedSimpleRouter(router, r'users', lookup='user'
 users_nested_router.register(r'membership_payments', MembershipPaymentModelViewSet, basename='membership-payments')
 users_nested_router.register(r'payments_status', MembershipPaymentStatusModelViewSet,
                              basename='membership-payments-status')
+users_nested_router.register(r'payment-opt-in', UserOptInContributionFieldsModelViewSet,
+                             basename='payment-opt-in')
 
 urlpatterns = [
     path('staff/', admin.site.urls),

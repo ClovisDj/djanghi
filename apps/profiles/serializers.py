@@ -2,6 +2,7 @@ import datetime
 
 from django.contrib.auth.models import update_last_login
 from django import forms
+from django.db import IntegrityError
 from django.utils import timezone
 from rest_framework_json_api import serializers
 from rest_framework import exceptions
@@ -9,9 +10,11 @@ from rest_framework_simplejwt.serializers import TokenObtainSerializer
 from rest_framework_simplejwt.settings import api_settings
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .models import User, UserRegistrationLink, UserRole, PasswordResetLink
+from .models import User, UserRegistrationLink, UserRole, PasswordResetLink, UserOptInContributionFields
+from ..associations.models import MemberContributionField
 from ..associations.serializers import AssociationModelSerializer
 from ..extensions.backend import DjanghiModelBackend
+from ..mixins import SerializerRequestInitMixin
 
 
 class LoginSerializer(TokenObtainSerializer):
@@ -372,3 +375,89 @@ class PasswordResetLinkModelSerializer(serializers.ModelSerializer):
         validated_data.pop('association_label', False)
         validated_data.pop('email', False)
         return super().create(validated_data)
+
+
+class UserOptInContributionFieldsModelSerializer(SerializerRequestInitMixin,
+                                                 serializers.ModelSerializer):
+    _STATE_ORDER = (
+        UserOptInContributionFields.REQUESTED,
+        UserOptInContributionFields.IN_PROCESS,
+        UserOptInContributionFields.APPROVED,
+        UserOptInContributionFields.DECLINED,
+    )
+    requested_field_id = serializers.UUIDField(required=True)
+    state = serializers.ChoiceField(
+        choices=UserOptInContributionFields.STATES,
+        default=UserOptInContributionFields.REQUESTED
+    )
+
+    class Meta:
+        model = UserOptInContributionFields
+        read_only_fields = (
+            'created_at',
+            'updated_at',
+            'approved_by',
+            'user',
+            'approved_date',
+        )
+        exclude = (
+            'association',
+        )
+
+    class JSONAPIMeta:
+        included_resources = ('user', 'approved_by')
+
+    included_serializers = {
+        'user': IncludedUserModelSerializer,
+        'approved_by': IncludedUserModelSerializer,
+    }
+
+    def validate_requested_field_id(self, requested_field_id):
+        membership_field_qs = (
+            self.request.user.association.member_contribution_fields.filter(
+                id=str(requested_field_id),
+                archived=False
+            )
+            if self.request else None
+        )
+
+        if membership_field_qs is not None and membership_field_qs.exists():
+            if not membership_field_qs[0].member_can_opt_in:
+                raise serializers.ValidationError('Cannot opt-in to a non opt-in payment type.')
+            return requested_field_id
+
+        raise serializers.ValidationError('This payment field does not exists!')
+
+    def validate_state(self, state):
+        if self.instance \
+                and state != UserOptInContributionFields.DECLINED \
+                and self._STATE_ORDER.index(state) < self._STATE_ORDER.index(self.instance.state):
+            # Cannot move backward with state, only forward
+            raise serializers.ValidationError("Cannot move back to a precedent state")
+
+        if not self.instance and 0 < self._STATE_ORDER.index(state):
+            raise serializers.ValidationError(
+                f"Cannot create an opt-in with a state other than '{UserOptInContributionFields.REQUESTED}'"
+            )
+
+        return state
+
+    def create(self, validated_data):
+        validated_data['user_id'] = self.extract_user_id_from_nested_route()
+        validated_data['association'] = self.request.user.association
+        try:
+            return super().create(validated_data)
+        except IntegrityError:
+            raise serializers.ValidationError(
+                {'requested_field_id': f'An opt-in request for this payment already exists'}
+            )
+
+    def update(self, instance, validated_data):
+        # This field cannot be updated
+        validated_data.pop('requested_field_id', False)
+        state = validated_data.get('state')
+        if state and state == UserOptInContributionFields.APPROVED:
+            validated_data['contrib_field_id'] = self.instance.requested_field_id
+            validated_data['approved_by'] = self.request.user
+
+        return super().update(instance, validated_data)

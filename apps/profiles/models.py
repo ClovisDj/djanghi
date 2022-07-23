@@ -199,16 +199,6 @@ class User(AbstractUser):
     def user_roles_set_by(self, field_name):
         return set(self.roles.all().values_list(field_name, flat=True))
 
-    def revoke_roles(self, *role):
-        user_roles_set = self.user_roles_set_by('id')
-        roles_to_revoke = self.get_roles(*role)
-        roles_to_revoke_set = {role.id for role in roles_to_revoke} if roles_to_revoke else set()
-        diff_roles_set = user_roles_set - roles_to_revoke_set
-
-        if diff_roles_set:
-            self.roles.clear()
-            self.roles.add(*diff_roles_set)
-
     def has_roles(self, *roles):
         roles_obj = self.get_roles(*roles)
         if not roles_obj:
@@ -334,7 +324,7 @@ class UserOptInContributionFields(CreateUpdateDateMixin,
         related_name='opted_in_contrib_fields'
     )
     contrib_field = models.ForeignKey(
-        'associations.Association',
+        'associations.MemberContributionField',
         on_delete=models.CASCADE,
         related_name='opted_in_users',
         null=True,
@@ -352,6 +342,15 @@ class UserOptInContributionFields(CreateUpdateDateMixin,
     state = models.CharField(max_length=20, choices=STATES, default=REQUESTED)
     approved_date = models.DateTimeField(null=True, blank=True)
     note = models.TextField(null=True, blank=True)
+
+    class Meta:
+        ordering = ['user__first_name', 'user__last_name', 'user__email']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'requested_field_id'],
+                name='unique_opt_in_by_user'
+            )
+        ]
 
     def validate_state(self):
         is_valid = False
