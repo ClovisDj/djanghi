@@ -398,6 +398,7 @@ class UserOptInContributionFieldsModelSerializer(SerializerRequestInitMixin,
             'updated_at',
             'approved_by',
             'user',
+            'author',
             'approved_date',
         )
         exclude = (
@@ -435,7 +436,7 @@ class UserOptInContributionFieldsModelSerializer(SerializerRequestInitMixin,
             # Cannot move backward with state, only forward
             raise serializers.ValidationError("Cannot move back to a precedent state")
 
-        if not self.instance and 0 < self._STATE_ORDER.index(state):
+        if not self.instance and 0 < self._STATE_ORDER.index(state) and not self.request.user.is_full_admin:
             raise serializers.ValidationError(
                 f"Cannot create an opt-in with a state other than '{UserOptInContributionFields.REQUESTED}'"
             )
@@ -444,7 +445,14 @@ class UserOptInContributionFieldsModelSerializer(SerializerRequestInitMixin,
 
     def create(self, validated_data):
         validated_data['user_id'] = self.extract_user_id_from_nested_route()
+        validated_data['author'] = self.request.user
         validated_data['association'] = self.request.user.association
+        state = validated_data.get('state')
+
+        if state and state == UserOptInContributionFields.APPROVED and self.request.user.is_full_admin:
+            validated_data['contrib_field_id'] = validated_data['requested_field_id']
+            validated_data['approved_by'] = self.request.user
+
         try:
             return super().create(validated_data)
         except IntegrityError:

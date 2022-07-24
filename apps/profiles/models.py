@@ -323,6 +323,11 @@ class UserOptInContributionFields(CreateUpdateDateMixin,
         on_delete=models.CASCADE,
         related_name='opted_in_contrib_fields'
     )
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='contrib_opt_in_authored'
+    )
     contrib_field = models.ForeignKey(
         'associations.MemberContributionField',
         on_delete=models.CASCADE,

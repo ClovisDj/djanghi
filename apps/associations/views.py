@@ -8,6 +8,7 @@ from rest_framework_json_api.views import AutoPrefetchMixin
 from apps.associations.models import MemberContributionField
 from apps.associations.serializers import MemberContributionFieldModelSerializer
 from apps.profiles import roles
+from apps.profiles.models import UserOptInContributionFields
 
 
 class MembershipContributionFieldsModelViewSet(mixins.CreateModelMixin,
@@ -47,3 +48,20 @@ class MembershipContributionFieldsModelViewSet(mixins.CreateModelMixin,
             contrib_field.save()
 
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class ContribFieldOptInModelViewSet(mixins.CreateModelMixin,
+                                    mixins.ListModelMixin,
+                                    GenericViewSet):
+
+    queryset = UserOptInContributionFields.objects.all()
+    # serializer_class = BulkMembershipPaymentModelSerializer
+    allowed_admin_roles = (roles.FULL_ADMIN, )
+
+    @transaction.atomic
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(status=status.HTTP_201_CREATED, headers=headers)

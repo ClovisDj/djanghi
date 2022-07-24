@@ -28,6 +28,7 @@ class Migration(migrations.Migration):
                 ('association', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='associations.association')),
                 ('contrib_field', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='opted_in_users', to='associations.membercontributionfield')),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='opted_in_contrib_fields', to=settings.AUTH_USER_MODEL)),
+                ('author', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='contrib_opt_in_authored', to=settings.AUTH_USER_MODEL)),
             ],
             options={
                 'abstract': False,
