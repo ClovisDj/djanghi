@@ -20,7 +20,7 @@ from apps.profiles import serializers, roles
 from apps.profiles.models import User, UserRegistrationLink, PasswordResetLink, UserOptInContributionFields
 from apps.profiles.serializers import UserModelSerializer, UserAdminModelSerializer, UserRegistrationModelSerializer, \
     UserRegistrationForm, PasswordResetLinkModelSerializer, PasswordResetForm, \
-    UserOptInContributionFieldsModelSerializer
+    UserOptInContributionFieldsModelSerializer, BulkUserOptInContributionFieldsModelSerializer
 from apps.utils import _force_login
 
 
@@ -168,3 +168,21 @@ class UserOptInContributionFieldsModelViewSet(mixins.CreateModelMixin,
     @transaction.atomic
     def update(self, request, *args, **kwargs):
         return super().update(request, *args, **kwargs)
+
+
+class ContribFieldOptInModelViewSet(mixins.CreateModelMixin,
+                                    mixins.ListModelMixin,
+                                    AutoPrefetchMixin,
+                                    GenericViewSet):
+
+    queryset = UserOptInContributionFields.objects.filter(contrib_field__member_can_opt_in=True)
+    serializer_class = BulkUserOptInContributionFieldsModelSerializer
+    allowed_admin_roles = (roles.FULL_ADMIN, )
+
+    @transaction.atomic
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(status=status.HTTP_201_CREATED, headers=headers)

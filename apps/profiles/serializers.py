@@ -1,3 +1,4 @@
+import copy
 import datetime
 
 from django.contrib.auth.models import update_last_login
@@ -11,7 +12,6 @@ from rest_framework_simplejwt.settings import api_settings
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import User, UserRegistrationLink, UserRole, PasswordResetLink, UserOptInContributionFields
-from ..associations.models import MemberContributionField
 from ..associations.serializers import AssociationModelSerializer
 from ..extensions.backend import DjanghiModelBackend
 from ..mixins import SerializerRequestInitMixin
@@ -469,3 +469,40 @@ class UserOptInContributionFieldsModelSerializer(SerializerRequestInitMixin,
             validated_data['approved_by'] = self.request.user
 
         return super().update(instance, validated_data)
+
+
+class BulkUserOptInContributionFieldsModelSerializer(UserOptInContributionFieldsModelSerializer):
+    user_ids = serializers.ListSerializer(
+        child=serializers.UUIDField(),
+        write_only=True,
+        required=True
+    )
+
+    def validate_user_ids(self, user_ids):
+        valid_user_ids = User.objects \
+            .for_association(association=self.request.user.association) \
+            .filter(is_active=True, id__in=user_ids) \
+            .values_list('id', flat=True)
+
+        if len(valid_user_ids) == 0:
+            raise serializers.ValidationError("Should Provide at least one valid user")
+
+        return valid_user_ids
+
+    def create(self, validated_data):
+        create_data = copy.deepcopy(validated_data)
+        create_data.pop('user_ids', None)
+        create_data['author'] = self.request.user
+        create_data['association'] = self.request.user.association
+        state = validated_data.get('state')
+
+        if state and state == UserOptInContributionFields.APPROVED:
+            create_data['contrib_field_id'] = validated_data['requested_field_id']
+            create_data['approved_by'] = self.request.user
+
+        created_obj = None
+        for user_id in validated_data['user_ids']:
+            create_data['user_id'] = user_id
+            created_obj = self.Meta.model.objects.create(**create_data)
+
+        return created_obj

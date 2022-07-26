@@ -3,13 +3,15 @@ from rest_framework import routers
 from rest_framework_simplejwt.views import TokenRefreshView
 
 from apps.profiles.views import ApiLoginView, UserRegistrationViewSet, UserRegistrationView, \
-    PasswordResetLinkModelViewSet, PasswordResetView
+    PasswordResetLinkModelViewSet, PasswordResetView, ContribFieldOptInModelViewSet
 
 app_name = 'profiles'
 router = routers.SimpleRouter(trailing_slash=False)
 
 router.register(r'registrations', UserRegistrationViewSet, basename='registrations')
 router.register(r'reset-password', PasswordResetLinkModelViewSet, basename='reset-password')
+router.register(r'contribution_field_opt_ins', ContribFieldOptInModelViewSet,
+                basename='contrib-field-opt-ins')
 
 urlpatterns = [
     path('obtain_token', ApiLoginView.as_view(), name='login_view'),

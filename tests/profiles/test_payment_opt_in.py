@@ -150,6 +150,23 @@ class TestUserPaymentOptIn(ActMixin):
             status_code=status.HTTP_201_CREATED
         )
 
+    def test_a_full_admin_can_opt_in_a_user_with_state_approved(self, abc_user, alice_full_admin,
+                                                                authenticated_alice_user_client,
+                                                                abc_payments_type):
+        assert abc_payments_type[1].member_can_opt_in
+
+        response_data = self.act(
+            self.get_list_url(abc_user),
+            authenticated_alice_user_client,
+            data={
+                'requested_field_id': str(abc_payments_type[1].id),
+                'state': UserOptInContributionFields.APPROVED
+            },
+            status_code=status.HTTP_201_CREATED
+        ).json()['data']['attributes']
+
+        assert response_data['state'] == UserOptInContributionFields.APPROVED
+
     @pytest.mark.skip(reason="Flaky when run with other tests")
     def test_unique_contribution_field_opt_in_by_user(self, abc_user, abc_user_insurance_opt_in,
                                                       authenticated_abc_user_client,
@@ -192,6 +209,22 @@ class TestUserPaymentOptIn(ActMixin):
             data={'state': UserOptInContributionFields.APPROVED},
             status_code=status.HTTP_403_FORBIDDEN
         )
+
+    def test_a_full_admin_cannot_move_backward_with_an_opt_in_object(self, abc_user, alice_full_admin,
+                                                                     abc_user_insurance_opt_in,
+                                                                     authenticated_alice_user_client):
+        assert alice_full_admin.is_full_admin
+        assert abc_user_insurance_opt_in.state == UserOptInContributionFields.APPROVED
+
+        error_response = self.act(
+            f'{self.get_list_url(abc_user)}/{str(abc_user_insurance_opt_in.id)}',
+            authenticated_alice_user_client,
+            method='patch',
+            data={'state': UserOptInContributionFields.IN_PROCESS},
+            status_code=status.HTTP_400_BAD_REQUEST
+        ).json()['errors'][0]
+
+        assert error_response['detail'] == 'Cannot move back to a precedent state'
 
     def test_a_full_admin_can_modify_a_user_payment_opt_in_object(self, abc_user, alice_full_admin,
                                                                   abc_user_insurance_opt_in,

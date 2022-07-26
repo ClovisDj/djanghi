@@ -97,3 +97,11 @@ def xyz_user_insurance_opt_in(xyz_user, xyz_payments_type):
         requested_field_id=xyz_payments_type[1].id,
         state=UserOptInContributionFields.APPROVED
     )
+
+
+@pytest.fixture
+def abc_bulk_contrib_opt_in_data(abc_user, user_alice, third_abc_user, abc_payments_type):
+    return {
+        'user_ids': [str(abc_user.id), str(user_alice.id), str(third_abc_user.id)],
+        'requested_field_id': str(abc_payments_type[1].id),
+    }
