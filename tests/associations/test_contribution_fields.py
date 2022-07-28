@@ -68,6 +68,20 @@ class TestAssociationContributionField(ActMixin):
             status_code=status.HTTP_201_CREATED
         )
 
+    def test_max_active_contrib_fields_allowed_by_association(self, authenticated_alice_user_client, alice_full_admin,
+                                                              abc_payments_type, xyz_payments_type, settings):
+        settings.MAX_PAGE_SIZE = 3
+
+        response = self.act(
+            self.list_url,
+            authenticated_alice_user_client,
+            data=self.create_data,
+            method='post',
+            status_code=status.HTTP_400_BAD_REQUEST
+        ).json()['errors'][0]
+
+        assert response["detail"] == f'Max {settings.MAX_PAGE_SIZE} active payment fields allowed'
+
     def test_contribution_field_name_should_be_unique_for_an_association(self, authenticated_alice_user_client,
                                                                          abc_payments_type, alice_full_admin):
         error_data = self.act(

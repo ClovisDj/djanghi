@@ -1,10 +1,13 @@
+from django.conf import settings
 from django.db import IntegrityError
 from rest_framework_json_api import serializers
 
 from apps.associations.models import Association, MemberContributionField
+from apps.mixins import SerializerRequestInitMixin
 
 
-class MemberContributionFieldModelSerializer(serializers.ModelSerializer):
+class MemberContributionFieldModelSerializer(SerializerRequestInitMixin,
+                                             serializers.ModelSerializer):
     class Meta:
         model = MemberContributionField
         read_only_fields = (
@@ -17,10 +20,17 @@ class MemberContributionFieldModelSerializer(serializers.ModelSerializer):
             'association',
         )
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def validate(self, attrs):
+        contrib_field_qs = MemberContributionField.objects.active()
+        exceeding_max_contrib_field = (
+            self.instance is None
+            and self.request
+            and settings.MAX_PAGE_SIZE <= contrib_field_qs.filter(association=self.request.user.association).count()
+        )
+        if exceeding_max_contrib_field:
+            raise serializers.ValidationError(f"Max {settings.MAX_PAGE_SIZE} active payment fields allowed")
 
-        self.request = getattr(self, 'context', {}).get('request')
+        return attrs
 
     def create(self, validated_data):
         validated_data['association'] = self.request.user.association
